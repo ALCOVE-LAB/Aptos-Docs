@@ -2,10 +2,10 @@
 aip: 36
 标题: 全局唯一标识符
 作者: satya@aptoslabs.com, ikabiljo@aptoslabs.com
-讨论至 (*可选): https://github.com/aptos-foundation/AIPs/issues/154
+讨论区 (*可选): https://github.com/aptos-foundation/AIPs/issues/154
 状态: 草案
 类型: 标准
-创建时间: 06/01/2023
+创建日期: 06/01/2023
 ---
 
 # AIP 36 - 全局唯一标识符

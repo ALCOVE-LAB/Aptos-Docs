@@ -2,7 +2,7 @@
 aip: 35
 标题: 收取不变性违规错误 
 作者: runtian@aptoslabs.com
-讨论区: [<a url pointing to the official discussion thread>](https://github.com/aptos-foundation/AIPs/issues/144)
+讨论区: https://github.com/aptos-foundation/AIPs/issues/144
 状态: 已批准
 类型: 信息类
 创建日期: 05/17/2023
