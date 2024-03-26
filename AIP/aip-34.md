@@ -8,7 +8,7 @@ aip: 34
 类型: 标准
 创建日期: <mm/dd/yyyy>
 更新时间 (*可选): <mm/dd/yyyy>
-依赖 (*可选): <AIP number(s)>
+需求 (*可选): <AIP number(s)>
 ---
 
 # AIP-34 - 单位 Gas 价格预估
