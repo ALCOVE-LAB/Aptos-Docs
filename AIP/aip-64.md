@@ -38,7 +38,7 @@ Aptos 区块链目前主要处理两种类型的交易：`UserTransaction`和特
 未来的应用需要区块链能够高效地对链上特定提案达成共识并更新。Validator 交易能够使验证器快速提议更改，并在几秒钟内达成共识，这得益于 Aptos 区块链的低延迟特性。如果没有 Validator 交易，要达成这样的共识只能依赖于 [Aptos Governance](https：//aptos.dev/concepts/governance/)，这将是一个更长周期的流程，不仅需要几天甚至几周的时间，而且每次都需手动提交提案。
 
 Validator 交易框架的一个典型应用场景是，验证器可以以最小的延迟更新链上另一个特性的配置。如下 Aptos 特性已经使用了 Validator 交易：
-- 在［链上随机性］（https：//github.com/aptos-foundation/AIPs/pull/321/files）的设计中，用于 epoch `e`的验证器随机生成的密钥份额是链上配置的一部分。这些密钥份额在 epoch `e-1`结束时链下生成，随后通过 ValidatorTransaction 上传到链上。
+- 在[链上随机性](https：//github.com/aptos-foundation/AIPs/pull/321/files)的设计中，用于 epoch `e`的验证器随机生成的密钥份额是链上配置的一部分。这些密钥份额在 epoch `e-1`结束时链下生成，随后通过 ValidatorTransaction 上传到链上。
 - 在[无密钥账户](https：//github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md)设计中，每个 OIDC 提供商的最新 JWKs 是特性配置的一部分，需要尽快在链上进行更新。通过子特性[JWK 共识](https：//github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md)，`ValidatorTransaction` 框架被用来发布已获得必要认证的链上 JWK 更新。
 
 ## 影响
