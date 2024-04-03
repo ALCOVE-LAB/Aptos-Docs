@@ -14,7 +14,7 @@ updated: 2023/01/26
 
 # AIP - 12 - 多签账户
 
-## 一、概要
+## 一、概述
 
 这份 AIP 推出了一个全新的多签名账户标准。这个标准主要通过在智能合约（multisig_account）中定义明确的数据结构和功能实现管理，与目前采用多重 Ed25519 授权密钥（multied25519-auth-key）的账户相比，使用起来更为便捷，功能也更加全面。此外，它还强调了整合为 Aptos 中更广义的账户系统一部分的发展方向，为用户提供更多样化的账户类型和账户管理功能。 
 
@@ -53,7 +53,7 @@ updated: 2023/01/26
 
    > A multisig account module that governs creating/managing multisig accounts and creating/approving/rejecting/executing multisig account transactions. Execution function will be private by default and only executed by:
 
-2. 一种新的交易类型，它允许执行人（必需是所有者之一）代替多签名账户执行交易数据负载（transaction payload）。这种执行是通过调用多签名账户模块的私有执行函数来进行验证的。此类交易也可以扩展应用到其他模拟/委托场景（impersonation/delegation），比如支付 Gas 费来执行另一个账户的交易。
+2. 一种新的交易类型，它允许执行人（必需是所有者之一）代替多签名账户执行交易数据负载（transaction payload）。这种执行是通过调用多签名账户模块的私有执行函数来进行验证的。此类交易也可以扩展应用到其他模拟 / 委托场景（impersonation / delegation），比如支付 Gas 费来执行另一个账户的交易。
 
 ### 1. 数据结构和多签账户模块
 
@@ -150,7 +150,7 @@ pub struct Multitsig {
 5. 要批准或拒绝交易，其他拥有者可以调用 `multisig_account::approve()` 或 `reject()` 并提供交易ID。
 6. 如果有足够的拒绝（≥ 签名门槛），任何拥有者都可以通过调用 `multisig_account::remove()` 来移除交易。
 7. 如果有足够的批准（≥ 签名门槛），任何拥有者都可以使用特殊的 MultisigTransaction 类型创建下一个交易，如果仅在链上存储了哈希，则交易负载是可选的。如果在创建时存储了完整的负载，则多重签名交易不需要指定除多签账户地址之外的任何参数。VM中的详细流程如下：
-    1. 交易序言（prologue）：VM首先调用一个私有函数（`multisig_account::validate_multisig_transaction`）来验证提供的多重签名账户中待执行的下一个交易是否存在，并且是否有足够的批准（ approvals ）来进行执行。
+    1. 交易序言（prologue）：VM首先调用一个私有函数（`multisig_account::validate_multisig_transaction`）来验证提供的多重签名账户中待执行的下一个交易是否存在，并且是否有足够的批准（approvals）来进行执行。
     2. 交易执行：
         1. VM 首先获取多签交易中底层调用的数据负载。如果交易序言（验证）成功，这个步骤不应该失败。
         2. 然后 VM 尝试执行此函数并记录结果。
@@ -172,7 +172,7 @@ pub struct Multitsig {
 
 长期来看：
 
-目前的提案不允许在链上执行多重签名交易——其他模块只能创建交易并允许拥有者批准/拒绝。执行将需要发送一个专门的多重签名交易类型。然而，在未来，随着Move中动态调度支持（dynamic dispatch support ）的引入，使其变得更简单。这将允许在链上执行，也可以通过标准用户交易类型（而不是特殊的多重签名交易类型）在链下执行。动态调度还允许向多重签名账户模型添加更多模块化组件，以实现自定义交易认证等。
+目前的提案不允许在链上执行多重签名交易——其他模块只能创建交易并允许拥有者批准/拒绝。执行将需要发送一个专门的多重签名交易类型。然而，在未来，随着 Move 中动态调度支持（dynamic dispatch support ）的引入，使其变得更简单。这将允许在链上执行，也可以通过标准用户交易类型（而不是特殊的多重签名交易类型）在链下执行。动态调度还允许向多重签名账户模型添加更多模块化组件，以实现自定义交易认证等。
 
 多重签名账户还可以实现另一种更通用的账户抽象模型，其中链上认证可以定制，以允许账户 A 根据账户 B 定义的模块/功能执行交易。这将使得更强大的链下系统（如游戏）能够抽象化交易和认证流程，而无需用户对它们的工作原理有深入的了解。
 

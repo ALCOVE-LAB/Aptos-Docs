@@ -14,7 +14,7 @@ requires: "AIP-10: Move Objects"
 
 # AIP - 11 - 数字资产：作为对象的 Token 
 
-## 一、概要
+## 一、概述
 
 本AIP提议使用 *Move Objects* 为 Aptos 提供一个新的 Token 标准。在这个模型中，一个 Token 表示一个更大资产 Collection 中的独特资产。 Collection 和资产的Move对象表示都支持对象模型的可扩展性，以支持创建丰富的应用程序，如NFTs、游戏资产、无代码解决方案，同时保持完全的接口兼容性。这使得应用程序可以利用 Token 专注于 Token 的高级目的，或者跨所有 Token 进行泛化，例如特定游戏发行商的 Token 商店前端与 Token 市场之间的区别。
 
@@ -22,18 +22,18 @@ requires: "AIP-10: Move Objects"
 
 对象提供了一种自然的方式来表示具有以下特点的 Token ：
 
-- **全球寻址**：早期的Aptos Token 标准允许 Token 放置在任何地方，如果用户没有仔细跟踪他们的 Token，这种方式可能导致混乱的用户体验。
+- **全球寻址**：早期的 Aptos Token 标准允许 Token 放置在任何地方，如果用户没有仔细跟踪他们的 Token ，这种方式可能导致混乱的用户体验。
 - **共享状态**：每个 Token 共享相同的核心数据模型和业务逻辑，使它们能广泛适用于不同的通用 Token 应用。
 - **可扩展**： Token 公开了可以修改核心业务的逻辑。
 - **存储效率**：每个 Token 将其资源存储在资源组内（resource group），可以被其他层共享。
-- **可组合**： Token 能够拥有其他 Token ，使创建者可以构建丰富的链上应用程序。
+- **可组合**：Token 能够拥有其他 Token ，使创建者可以构建丰富的链上应用程序。
 - **简化**：最后， Token 具有明确定义的属性，如绑定灵魂 (Soul bound)、销毁 (Burning) 和冻结 (Freezing)，并且他们之间可以完美协作（work seamlessly）。
 
 许多相同的属性同样适用于 Collection 。
 
 ## 三、基本原理
 
-现有的 Token 模型存在两个主要问题：过于全面且在 Move 编程环境中过分依赖 `store` 功能。为了解决 Move 之前对象的局限性，Token 标准不得不试图应对 Token 领域可预见的挑战，如果这个问题处理不当，将难以避免产生问题。这个过程中衍生出了许多难以理解的功能，如 `property_versions`，同时也缺少了如冻结（freeze）或灵魂绑定（soul bound）等重要特性，以及一些其他的问题。另外，由于该模型过于依赖于 `store` 功能，Token 数据可能会被放置在链上任何地方，从而可能带来许多用户体验问题。这个基于对象的新模型解决了许多已知的问题，但这样的改进可能需要现有的基础设施过渡到新模型，虽然这一变动对使用数据检索工具（ indexers）和开发工具包（SDKs）的用户来说可能几乎无感。
+现有的 Token 模型存在两个主要问题：过于全面且在 Move 编程环境中过分依赖 `store` 功能。为了解决 Move 之前对象的局限性，Token 标准不得不试图应对 Token 领域可预见的挑战，如果这个问题处理不当，将难以避免产生问题。这个过程中衍生出了许多难以理解的功能，如 `property_versions`，同时也缺少了如冻结（freeze）或灵魂绑定（soul bound）等重要特性，以及一些其他的问题。另外，由于该模型过于依赖于 `store` 功能，Token 数据可能会被放置在链上任何地方，从而可能带来许多用户体验方面的问题。这个基于对象的新模型解决了许多已知的问题，但这样的改进可能需要现有的基础设施过渡到新模型，虽然这一变动对使用数据检索工具（indexers）和开发工具包（SDKs）的用户来说可能几乎无感。
 
 同样重要的是，预计将继续维护和支持现行的 Token 标准，并为现有 Token 提供向新标准过渡的方案。社区也应意识到定期更新 Token 标准是必要的，我们需要适应这样的变革。
 
@@ -47,7 +47,7 @@ requires: "AIP-10: Move Objects"
 
 因为 Token 建立在对象之上，它们必须遵循对象标识符（Object IDs）的生成方式。对象标识符使用以下方式生成：`sha3_256(address_of(creator) | seed | 0xFE)` 或 `sha3_256(GUID | 0xFD)`。 Token 可以使用 `seed` 字段为每个 Token 生成唯一的地址。当生成种子（seed）时， Token 使用以下方式：`bcs::to_bytes(collection) | b"::" | bcs::to_bytes(name)`，也支持通过GUID生成对象标识符。类似地，Collection在生成种子时使用以下方式：`bcs::to_bytes(collection)`。这确保了所有Collection和 Token 的全局唯一性，除非 Token 或 Collection 已被销毁。请注意，选择`0xFE`是为了提供域分离（domain separation），并确保地址生成是唯一的，以防止对象和账户之间的重复地址生成。
 
-由于现有的 Token 迭代不利用基于 `GUID` 的对象标识符生成，因为存在发现性（ discoverability）挑战。具体来说，一旦 Aptos 有足够的节点内（on-node）索引来识别基于`GUID`的对象，我们才可能推出更新的标准。
+由于现有的 Token 迭代不利用基于 `GUID` 的对象标识符生成，因为存在发现性（discoverability）挑战。具体来说，一旦 Aptos 有足够的节点内（on-node）索引来识别基于`GUID`的对象，我们才可能推出更新的标准。
 
 ### 2. 核心逻辑
 
@@ -57,7 +57,7 @@ Token 标准包括 Token 本身、Token 集合（Collections） 以及版税（R
 
 在创建 Token 之前，必须首先存在一个 Collection  。
 
- Collection 的创建者是唯一能够向该 Collection 添加 Token 的实体（entity ）。
+ Collection 的创建者是唯一能够向该 Collection 添加 Token 的实体（entity）。
 
  Token 公开了允许修改 Token 字段和销毁 Token 的 `ref`。
 
@@ -83,7 +83,7 @@ Token 标准包括 Token 本身、Token 集合（Collections） 以及版税（R
 
 ### 3. 数据结构
 
-本标准指定了 Token 、 Collection 和  Royalties 的数据结构。
+本标准指定了 Token 、 Collection 和  Royaltie 的数据结构。
 
 ###  4. Token 数据结构
 
@@ -358,5 +358,5 @@ https://github.com/aptos-labs/aptos-core/pull/7277 中的第一个提交
 
 - 探索版本自2023年1月起存在于`move-examples`中。
 - 到2023年3月中旬，对框架的一般性认识已经达成。
-- 到2023年5月中旬，主网（Mainne）发布--版本1.4。
+- 到2023年5月中旬，主网（Mainne）发布 -- 版本1.4。
 

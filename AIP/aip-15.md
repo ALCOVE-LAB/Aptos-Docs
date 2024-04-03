@@ -9,26 +9,26 @@ type: Standard (framework)
 created: 01/06/2023
 ---
 
-
+[toc]
 
 # AIP 15 - token 标准保留属性
 
 
 
-## 概述
+## 一、概述
 
 这项提案引入了框架保留属性，旨在： 
 
 1. 防止创建者随意修改 token 框架中已使用的属性。 
-2. 留出一部分属性，以便后续扩展以支持可编程的 token 行为，例如令牌冻结（token freezing）、灵魂绑定令牌（soulbound token）等。
+2. 留出一部分属性，以便后续扩T展以支持可编程的 token 行为，例如令牌冻结（token freezing）、灵魂绑定令牌（soulbound token）等。
 
-## 动机
+## 二、动机
 
-在我们的 [token 标准](https://aptos.dev/concepts/coin-and-token/aptos-token#token-burn)中定义了一些属性，用于控制谁有权限销毁 token 。不过，如果 token 的默认属性可以修改，那么创作者在 token 铸造之后就有可能新增这些控制属性。结果就是，创作者有可能销毁收藏家（collector）手中的 token 。这在 token 标准中被指出为一个已知问题，并推荐将令牌的默认属性设置为不可变作为一项最佳实践。为了彻底预防这一问题，本提案旨在确保在创建令牌之后无法更新这些控制属性。 
+在我们的 [Token 标准](https://aptos.dev/concepts/coin-and-token/aptos-token#token-burn)中定义了一些属性，用于控制谁有权限销毁 Token 。不过，如果 Token 的默认属性可以修改，那么创作者在 Token 铸造之后就有可能新增这些控制属性。结果就是，创作者有可能销毁收藏家（collector）手中的 Token 。这在 Token 标准中被指出为一个已知问题，并推荐将令牌的默认属性设置为不可变作为一项最佳实践。为了彻底预防这一问题，本提案旨在确保在创建令牌之后无法更新这些控制属性。 
 
-框架保留的属性可以用于控制令牌行为，使其具备可编程性。例如，可以设定一个框架保留的属性，在令牌存储中冻结 token（ freeze tokens）。
+框架保留的属性可以用于控制 Token 行为，使其具备可编程性。例如，可以设定一个框架保留的属性，在令牌存储中冻结 token（freeze tokens）。
 
-## 规范
+## 三、规范
 
 我们有 3 个现有的控制属性：
 
@@ -48,22 +48,22 @@ public(friend) fun add_non_framework_reserved_properties(map: &mut PropertyMap, 
 public(friend) fun update_non_framework_reserved_properties(map: &mut PropertyMap, key: String, value: PropertyValue)
 ```
 
-## 风险和缺陷
+## 四、风险和缺陷
 
 **令牌默认属性变更的额外成本** 
 
 在进行 `mutate_tokendata/token_property` 方法调用时，对框架预留属性的验证将消耗额外的 Gas 费用。目前，当创作者改动属性时，该函数会检查所有待修改的属性并更新其值。新增的成本在于我们需要验证属性键是否是以 `TOKEN_` 开头。通过采用子字符串匹配和及时终止比较，这部分额外的费用可以保持在最低水平。而且，目前的方法已经在字符串长度、键重复等方面进行了诸多验证，所以增加对属性键前缀的检查，对 Gas 成本和用户体验的影响应该可以忽略不计。
 
-## 时间表
+## 五、时间表
 
-这项更改尚未实施。理想情况下，这些更改应在 1 到 2 周内被合并到主分支，然后是测试网，最后是主网。
+这项更改尚未实施。理想情况下，这些更改应在 1 到 2 周内被合并到主分支，然后是 testnet ，最后是mainnet 。
 
-## 未来潜力
+## 六、未来潜力
 
 这将为基于此框架保留属性的关注 AIP（如 soulbound token 和 token freezing）铺平道路。
 
 这为依赖这些框架预留属性的绑定灵魂令牌（soulbound token）和令牌冻结（token freezing）相关后续 AIP (区块链改进提案) 铺平了道路。
 
-## 参考资料
+## 七、参考资料
 
 - [代币标准](https://aptos.dev/concepts/coin-and-token/aptos-token/)

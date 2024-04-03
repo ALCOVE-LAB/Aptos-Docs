@@ -14,7 +14,7 @@ updated: 2023/01/2
 
 # AIP - 13 - Coin 标准改进
 
-## 一、概要
+## 一、概述
 
 自从 Aptos 主网上线以来，社区提出了一些建议性改进，这将有助于加速 Coin 标准的应用。具体包括：
 
@@ -33,7 +33,7 @@ updated: 2023/01/2
 
 ## 三、提议
 
-我们可以切换到一种模式，在特定的 CoinType 没有 CoinStore 存在时，如果转移，则隐式创建 CoinStore（通过注册）。这可以作为aptos_coin 中的一个单独流程添加，类似于`aptos_coin::transfer`，如果一个 APT 转移不存在则隐式创建一个账户。此外，账户可以选择退出此行为（例如，为了避免接收垃圾代币）。详细流程如下：
+我们可以切换到一种模式，在特定的 CoinType 没有 CoinStore 存在时，如果转移，则隐式创建 CoinStore（通过注册）。这可以作为 aptos_coin 中的一个单独流程添加，类似于`aptos_coin::transfer`，如果一个 APT 转移不存在则隐式创建一个账户。此外，账户可以选择退出此行为（例如，为了避免接收垃圾代币）。详细流程如下：
 1. `aptos_coin::transfer_coins<CoinType>(from: &signer, to: address, amount: u64)`  默认情况下，如果 CoinType 不存在，则将注册接收方地址（创建 CoinStore ）。
 2. 账户可以选择退出（例如，为了避免接收垃圾 Coin ），方法是调用 `aptos_account::set_allow_direct_coin_transfers(false)` 。他们也可以稍后使用 `set_allow_direct_coin_transfers(true)` 来恢复。默认情况下，在此提案实施之前的所有现有账户和此后的新账户都将被隐式选择接收所有 Coin 。
 

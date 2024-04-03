@@ -396,7 +396,7 @@ let q2 = scalar_mul<GroupB2, ScalarForBx>(&p2, &k);
 
 ### 3. 用法示例
 
-#### 序列化和反序列化
+#### 3.1 序列化和反序列化
 
 ```rust
 // G1 元素的序列化和反序列化
@@ -416,7 +416,7 @@ let p2_uncompressed = deserialize::<G2, FormatG2Uncompr>(&bytes_uncompressed_g2)
 let p2_compressed = deserialize::<G2, FormatG2Compr>(&bytes_compressed_g2);
 ```
 
-#### 基本群操作
+#### 3.2 基本群操作
 
 ```rust
 // G1 元素相加
@@ -435,9 +435,9 @@ let pairing_result = pair(&p1, &q1);
 
 这些示例演示了在 Rust 中使用 BLS12-381 群进行序列化、反序列化和基本群操作的方法。
 
-#### 使用示例
+#### 3.3 使用示例
 
-##### 序列化和反序列化
+##### 3.3.1 序列化和反序列化
 
 ```rust
 // Gt 元素的序列化和反序列化
@@ -451,7 +451,7 @@ let bytes_fr = serialize::<Fr, FormatFrLsb>(&scalar_fr);
 let scalar_fr_deserialized = deserialize::<Fr, FormatFrLsb>(&bytes_fr);
 ```
 
-##### 哈希到群
+##### 3.3.2 哈希到群
 
 ```rust
 // 哈希到 G1 元素
