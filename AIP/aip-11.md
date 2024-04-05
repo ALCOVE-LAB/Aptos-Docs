@@ -16,7 +16,9 @@ requires: "AIP-10: Move Objects"
 
 ## 一、概述
 
-本AIP提议使用 *Move Objects* 为 Aptos 提供一个新的 Token 标准。在这个模型中，一个 Token 表示一个更大资产 Collection 中的独特资产。 Collection 和资产的Move对象表示都支持对象模型的可扩展性，以支持创建丰富的应用程序，如NFTs、游戏资产、无代码解决方案，同时保持完全的接口兼容性。这使得应用程序可以利用 Token 专注于 Token 的高级目的，或者跨所有 Token 进行泛化，例如特定游戏发行商的 Token 商店前端与 Token 市场之间的区别。
+本AIP提议使用 *Move Objects* 为 Aptos 提供一个新的 Token 标准。在这个模型中，每一个 Token 代表着庞大资产（assets）集合（collection）中的独一无二的某项资产。不论是代表资产集合，还是资产本身的 Move 对象，它们都利用了对象模型的可扩展性。此特性支持构建丰富的应用类别，例如非同质化代币（NFTs）、游戏资产和“无代码”解决方案等，同时确保这些应用在接口上保持兼容。这种设计使得基于 Token 的应用，不仅可以针对 Token 的高级功能进行专门化设计，例如某个具体的游戏出版商可能会有自己的 Token 商店，还可以实现对所有 Token 的泛化处理（ generalize across），如 Token 市场。
+
+
 
 ## 二、动机
 
