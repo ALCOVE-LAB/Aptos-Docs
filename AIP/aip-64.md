@@ -11,11 +11,9 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
----
 
 原文链接：https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-64.md
 
----
 
 # AIP-64 - Validator Transaction Type 验证者交易类型
 
