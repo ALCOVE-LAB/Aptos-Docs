@@ -11,6 +11,10 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
+
+原文链接：https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-64.md
+
+
 # AIP-64 - Validator Transaction Type 验证者交易类型
 
 ## 概述
@@ -29,11 +33,11 @@ Aptos 区块链目前主要处理两种类型的交易：`UserTransaction`和特
 
 ## 动机
 
-未来的应用需要区块链能够高效地对链上特定提案达成共识并更新。Validator 交易能够使验证器快速提议更改，并在几秒钟内达成共识，这得益于 Aptos 区块链的低延迟特性。如果没有 Validator 交易，要达成这样的共识只能依赖于［Aptos Governance］（https：//aptos.dev/concepts/governance/），这将是一个更长周期的流程，不仅需要几天甚至几周的时间，而且每次都需手动提交提案。
+未来的应用需要区块链能够高效地对链上特定提案达成共识并更新。Validator 交易能够使验证器快速提议更改，并在几秒钟内达成共识，这得益于 Aptos 区块链的低延迟特性。如果没有 Validator 交易，要达成这样的共识只能依赖于 [Aptos Governance](https：//aptos.dev/concepts/governance/)，这将是一个更长周期的流程，不仅需要几天甚至几周的时间，而且每次都需手动提交提案。
 
 Validator 交易框架的一个典型应用场景是，验证器可以以最小的延迟更新链上另一个特性的配置。如下 Aptos 特性已经使用了 Validator 交易：
-- 在［链上随机性］（https：//github.com/aptos-foundation/AIPs/pull/321/files）的设计中，用于 epoch `e`的验证器随机生成的密钥份额是链上配置的一部分。这些密钥份额在 epoch `e-1`结束时链下生成，随后通过 ValidatorTransaction 上传到链上。
-- 在［无密钥账户］（https：//github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md）设计中，每个 OIDC 提供商的最新 JWKs 是特性配置的一部分，需要尽快在链上进行更新。通过子特性［JWK 共识］（https：//github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md），ValidatorTransaction 框架被用来发布已获得必要认证的链上 JWK 更新。
+- 在[链上随机性](https：//github.com/aptos-foundation/AIPs/pull/321/files)的设计中，用于 epoch `e`的验证器随机生成的密钥份额是链上配置的一部分。这些密钥份额在 epoch `e-1`结束时链下生成，随后通过 ValidatorTransaction 上传到链上。
+- 在[无密钥账户](https：//github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md)设计中，每个 OIDC 提供商的最新 JWKs 是特性配置的一部分，需要尽快在链上进行更新。通过子特性[JWK 共识](https：//github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md)，`ValidatorTransaction` 框架被用来发布已获得必要认证的链上 JWK 更新。
 
 ## 影响
 
@@ -41,16 +45,16 @@ Validator 交易框架的一个典型应用场景是，验证器可以以最小�
 
 ## 可替代方案
 
-我们也有可能通过［Aptos Governance］（https：//aptos.dev/concepts/governance/）进行反复执行来实现类似的功能，但这个过程可能需要几天甚至几周的时间。然而，对于许多需要效率的应用情境而言，这并不现实。
+我们也有可能通过[Aptos Governance](https：//aptos.dev/concepts/governance/)进行反复执行来实现类似的功能，但这个过程可能需要几天甚至几周的时间。然而，对于许多需要效率的应用情境而言，这并不现实。
 
 为了发布链上配置更新，还存在一些其他的替代方案。其中一种是在已有的`BlockMetadata transactions`中发布更新。然而，尽管在一开始这省去了添加新交易类型的麻烦，但随着越来越多的功能采用这种方法，会出现一些长期问题：
 - `BlockMetadata`交易是关键的交易类型，它需要在执行时永不中断。在`BlockMetadata`交易中添加特性相关的更新需要对这些更新进行强验证，这本质上是无必要的。
-- 如果在单个`BlockMetadata`交易中顺序执行所有更新可能会导致处理速度过慢。正如在［安全性考虑］（#security_considerations）中所提到的那样，每次更新都需要进行加密验证，这可能进一步消耗系统。将更新分解到独立的交易中可以帮助加快执行速度。
+- 如果在单个`BlockMetadata`交易中顺序执行所有更新可能会导致处理速度过慢。正如在[安全性考虑](#security_considerations)中所提到的那样，每次更新都需要进行加密验证，这可能进一步消耗系统。将更新分解到独立的交易中可以帮助加快执行速度。
 
 第二种替代方案是将更新作为用户交易提交。但需注意一点：
 - 这些更新是针对系统配置的并通常需要比用户交易更高的优先级。
 - 与用户交易不同，这些更新的处理过程中并不涉及 gas 费。
-- 这些更新的执行结果需要采取与用户交易不一样的处理方法（详情请查看［安全性考虑］（#security_considerations））。
+- 这些更新的执行结果需要采取与用户交易不一样的处理方法(详情请查看[安全性考虑](#security_considerations))。
 
 因此，虽然第二种替代方案也能避免添加新的交易类型，但它无疑会增加现有用户交易流程的复杂性。为更新创建一个独立的处理流程应能确保代码更好的可维护性。
 
@@ -196,12 +200,12 @@ pub enum ProposalExt {
 
 每一个特性都需要定义 validator 交易的职责及其在提议阶段和执行阶段的验证方法。
 
-安全实践的详细定义应该在［安全考量］（#security-considerations）部分进行讨论。
+安全实践的详细定义应该在[安全考量](#security-considerations)部分进行讨论。
 
 ## 参考实现
 
-- ［https：//github.com/aptos-labs/aptos-core/pull/10963］（https：//github.com/aptos-labs/aptos-core/pull/10963）
-- ［https：//github.com/aptos-labs/aptos-core/pull/10971］（https：//github.com/aptos-labs/aptos-core/pull/10971）
+- [https：//github.com/aptos-labs/aptos-core/pull/10963](https：//github.com/aptos-labs/aptos-core/pull/10963)
+- [https：//github.com/aptos-labs/aptos-core/pull/10971](https：//github.com/aptos-labs/aptos-core/pull/10971)
 
 ## 测试（可选）
 
@@ -225,11 +229,11 @@ pub enum ProposalExt {
 
 没有什么能阻止恶意的 Validator 提出无效的 Validator 交易。因此，需要安全地实施 Validator 交易框架以减轻负面影响。
 - 一个区块中的 Validator 交易的数量和总大小应该受到限制。
-  （［参考实现］（https：//github.com/aptos-labs/aptos-core/blob/d4fdb8f08929903044673d03e79c9f118a6c714a/consensus/src/payload_client/mixed.rs#L82-L96））
+  ([参考实现](https：//github.com/aptos-labs/aptos-core/blob/d4fdb8f08929903044673d03e79c9f118a6c714a/consensus/src/payload_client/mixed.rs#L82-L96))
 - 如果特性 X 被禁用，那么在区块提案中应该不期望有特性 X 的 Validator 交易。
-  （［示例实现］（https：//github.com/aptos-labs/aptos-core/blob/7b2b2332f1f865b1ec367601045b2e0cd836a15d/consensus/src/round_manager.rs#L665-L673））
+  ([示例实现](https：//github.com/aptos-labs/aptos-core/blob/7b2b2332f1f865b1ec367601045b2e0cd836a15d/consensus/src/round_manager.rs#L665-L673))
 - 任何 Validator 交易中嵌入的更新应该能够获得群体认证。
     - 执行任何 Validator 交易应该涉及到群体认证的验证。
-      （［示例实现］（https：//github.com/aptos-labs/aptos-core/blob/d4fdb8f08929903044673d03e79c9f118a6c714a/aptos-move/aptos-vm/src/validator_txns/jwk.rs#L119-L127））
+      ([示例实现](https：//github.com/aptos-labs/aptos-core/blob/d4fdb8f08929903044673d03e79c9f118a6c714a/aptos-move/aptos-vm/src/validator_txns/jwk.rs#L119-L127))
     - 验证失败应该导致 Validator 交易被丢弃。
-      （［示例实现］（https：//github.com/aptos-labs/aptos-core/blob/d4fdb8f08929903044673d03e79c9f118a6c714a/aptos-move/aptos-vm/src/validator_txns/jwk.rs#L68-L75））
+      ([示例实现](https：//github.com/aptos-labs/aptos-core/blob/d4fdb8f08929903044673d03e79c9f118a6c714a/aptos-move/aptos-vm/src/validator_txns/jwk.rs#L68-L75))
