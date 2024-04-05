@@ -20,7 +20,7 @@ created: 01/06/2023
 这项提案引入了框架保留属性，旨在： 
 
 1. 防止创建者随意修改 token 框架中已使用的属性。 
-2. 留出一部分属性，以便后续扩T展以支持可编程的 token 行为，例如令牌冻结（token freezing）、灵魂绑定令牌（soulbound token）等。
+2. 留出一部分属性，以便后续扩展以支持可编程的 token 行为，例如令牌冻结（token freezing）、灵魂绑定令牌（soulbound token）等。
 
 ## 二、动机
 
