@@ -53,7 +53,7 @@ Aptos 链上治理是指 Aptos 社区可以通过提出、投票和解决提案�
 
 **脚本链**
 
-![Chain of Scripts](..\static\aip_images\[aip-3]_Chain_of_Scripts.png)
+![Chain of Scripts](../static/aip_images/[aip-3]_Chain_of_Scripts.png)
 
 在制作执行的脚本时，我们从序列中的最后一个脚本（假设它是第 `x` 个提案）入手，先对它进行哈希处理，然后把这个哈希值传给第 `x-1` 个提案。虽然上链的提案只会展示链中的第一个脚本，但通过在该脚本中嵌入哈希，这确保了整个脚本链的内容与执行顺序的完整性。我们会提供命令行工具来帮助创建这样的脚本链，并且确认每个脚本都存在并按照正确的顺序排列。
 
@@ -68,7 +68,7 @@ Aptos 链上治理是指 Aptos 社区可以通过提出、投票和解决提案�
 
 在我们提议的多步提案设计中，解决多步提案时：
 
-![Resolving Multi-Step Proposals](..\static\aip_images\[aip-3]_Resolving_Multi-Step_Proposals.png)
+![Resolving Multi-Step Proposals](../static/aip_images/[aip-3]_Resolving_Multi-Step_Proposals.png)
 
 - `aptos_governance::resolve_multi_step_proposal()` 返回一个签名者，并用下一个脚本的哈希替换当前的执行哈希。
 - `voting::resolve()` 检查当前脚本的哈希是否与提案的当前执行哈希相同，更新链上的 `proposal.execution_hash` 为 `next_execution_hash`，并为当前执行哈希发出事件。
