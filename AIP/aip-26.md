@@ -12,7 +12,7 @@ created: 2023年4月18日
 
 # AIP-26 - Quorum Store
 
-## 一、摘要
+## 一、概述
 
 Quorum Store 是对 Narwhal [^1]的生产优化实现，它提高了共识吞吐量。Quorum Store已在 previewnet 中进行了测试，这是一个类似主网的 100 多个节点网络，在此网络中，它将 TPS 提高了 3 倍。它将消除共识为吞吐量瓶颈的主要问题。它具有广泛的表区域，改变了验证者如何传播（disseminate）、排序（order）和执行交易（execute transcation）的细节。
 

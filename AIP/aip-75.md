@@ -15,7 +15,7 @@ requires (*optional): 61
 
 # AIP-75 - 无密钥账户的证明服务
 
-## 一、摘要
+## 一、概述
 
 本AIP是[AIP-61：无密钥账户](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md)的延伸，允许用户拥有一个与 OpenID 账户绑定的钱包，并通过其 OIDC 提供者而不是通过密钥为区块链进行交易签名。如 AIP-61 所总结的那样，"你的区块链账户 = 你的 OIDC 账户"。
 

@@ -15,7 +15,7 @@ last-call-end-date (*可选): <mm/dd/yyyy 最后留下反馈和评论的日期>
 
 # AIP-57 - 区块输出大小限制和冲突感知的区块 Gas 限制
 
-## 一、摘要
+## 一、概述
 
 本项工作是基于 [AIP-33](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-33.md) 进行的扩展，目的在于提高在各种工作负荷条件下延迟的可预测性。它包括：
 

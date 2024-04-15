@@ -12,7 +12,7 @@ discussions-to (*可选): https://github.com/aptos-foundation/AIPs/issues/259
 
 # AIP-54 - 对象代码部署
 
-## 一、摘要
+## 一、概述
 
 本 AIP 提出了一个简化的代码部署流程，旨在改善在 Aptos 上部署和升级 Move 模块的当前开发者体验。具体而言：
 1. 开发者可以将一个 Move 模块包部署到新创建的对象（object）而不是他们的账户。

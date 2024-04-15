@@ -15,7 +15,7 @@ discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/209
 
 # AIP-70 - 并行化可互换资产
 
-## 一、摘要
+## 一、概述
 
 本 AIP 提出了一种解决方案，通过并行化过程（从单线程到多线程）来加速可互换资产操作。目前，可互换资产在从单个集合或资产铸造（minting）时是单线程和顺序的，通过并行操作，我们可以期望获得更高的吞吐量/峰值。
 

@@ -31,10 +31,12 @@ requires (*optional): <AIP 编号(们)>
 
 - 使用最少的运营开销，以正确有效地管理白名单。
 - 一个专注于开发人员或用户意图的引用管理框架，而不是引用的能力
-    - 一个可能出错的场景是当`Refs`没有为 collection / token 正确配置或存储时。配置不当可能导致对集合和代币失去控制。我们希望提供开发者可以使用的行业标准代码，同时不必担心如何正确配置。
+    - 一个可能出错的场景是当`Refs`没有为 collection / token 正确配置或存储时。配置不当可能导致对collection 和 token 失去控制。我们希望提供开发者可以使用的行业标准代码，同时不必担心如何正确配置。
 - 作为标准，索引需要被构建一次，并且可以轻松地在该库的扩展中重复使用。
 - 提高代码的可重用性。
   - **[示例](https://github.com/aptos-labs/token-minter/blob/main/launchpad/sources/launchpad.move#L126)**，我们在不到50行的代码中构建了一个自定义铸造！（相同的操作至少需要300行以上）
+
+
 
 ## 三、规范
 
@@ -55,7 +57,7 @@ NFT 铸造者创建了一个核心铸造合约，该合约由 NFT 铸造标准�
 
 在创建 collection 时，传递给模块创建 collection 函数的签名者将成为所有者。**开发者决定这个所有者。**创建者直接拥有 collection object ，给予开发者灵活性，可以创建自定义 object 或账户来处理 token 的铸造、所有权和 collection 的管理。
 
-1. `CollectionComponents` 模块负责创建集合引用和属性。开发人员将有一个要传入的配置，根据此配置将生成引用。这包括允许转移代币、销毁代币、更改集合和代币描述。
+1. `CollectionComponents` 模块负责创建集合引用和属性。开发人员将有一个要传入的配置，根据此配置将生成引用。这包括允许转移token 、销毁 token 、更改 collection 和 token 描述。
 2. 只要引用是从集合属性配置中存储的，该模块将包含所有用于变更 collection 的入口函数。
 3. `CreateCollectionRefs` 和 `CreateCollectionProperties` 事件在集合创建后被发出。我们对这些事件进行索引，为开发人员创建激励，因为他们受益于索引事件。
 
@@ -103,19 +105,19 @@ struct CollectionProperties has key {
     mutable_description: bool,
     /// 确定创建者是否可以更改集合的 URI。
     mutable_uri: bool,
-    /// 确定创建者是否可以更改代币描述。
+    /// 确定创建者是否可以更改 token 描述。
     mutable_token_description: bool,
-    /// 确定创建者是否可以更改代币名称。
+    /// 确定创建者是否可以更改 token 名称。
     mutable_token_name: bool,
-    /// 确定创建者是否可以更改代币属性。
+    /// 确定创建者是否可以更改 token 属性。
     mutable_token_properties: bool,
-    /// 确定创建者是否可以更改代币 URI。
+    /// 确定创建者是否可以更改 token URI。
     mutable_token_uri: bool,
     /// 确定创建者是否可以更改版税。
     mutable_royalty: bool,
-    /// 确定创建者是否可以销毁代币。
+    /// 确定创建者是否可以销毁 token。
     tokens_burnable_by_creator: bool,
-    /// 确定创建者是否可以转让代币。
+    /// 确定创建者是否可以转让 token 。
     tokens_transferable_by_creator: bool,
 }
 
@@ -143,17 +145,16 @@ public fun create_collection(
 
 ### 3. Tokens
 
-token 模块将提供更新/改变 token 属性映射的功能。 `property_map.move` 将通过一个函数来更新带有 `ExtendRef` 的代币的属性映射。目前还没有支持此操作的函数，仅在构造 token 时使用 `ConstructorRef`。
+token 模块将提供更新/改变 token 属性映射的功能。 `property_map.move` 将通过一个函数来更新带有 `ExtendRef` 的 token 的属性映射。目前还没有支持此操作的函数，仅在构造 token 时使用 `ConstructorRef`。
 
 1. `TokenComponents` 模块负责创建与最初为 collection 配置的属性相关联的 token 引用。
 2. 只要引用是从 collection 属性配置中存储的，则此模块将包含所有用于改变 token 的入口函数。
-3. 创建代币引用时会发出 `CreateTokenRefs` 事件，并对这些事件进行索引。
+3. 创建 token 引用时会发出 `CreateTokenRefs` 事件，并对这些事件进行索引。
 
 ```move
 #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
-/// 代币引用的结构体，具有关键字。
 struct TokenRefs has key {
-    /// 用于生成代币的签名者。可用于扩展代币或从代币中转出对象。
+    /// 用于生成 token 的签名者。可用于扩展 token 或从 token 中转出对象。
     extend_ref: object::ExtendRef,
     /// 用于销毁。
     burn_ref: Option<token::BurnRef>,
@@ -166,7 +167,6 @@ struct TokenRefs has key {
 }
 
 #[event]
-/// 创建 TokenRefs 时发出的事件。
 struct CreateTokenRefs has drop, store {
     extend_ref_exists: bool,
     burn_ref_exists: bool,
@@ -175,7 +175,6 @@ struct CreateTokenRefs has drop, store {
     property_mutator_ref_exists: bool,
 }
 
-/// 创建代币。
 public fun create(
     creator: &signer,
     collection: Object<Collection>,
@@ -196,16 +195,16 @@ public fun create(
 
 ```move
 struct CoinPayment<phantom T> has copy, drop, store {
-    /// 要支付的代币数量。
+    /// 要支付的 coin 数量。
     amount: u64,
-    /// 要支付的地址。
+    /// 要支付 coin 的地址。
     destination: address,
     /// 此支付的类别，例如铸币费用、发射台费用。
     category: String,
 }
 
 #[event]
-/// 当类型为 `T` 的代币支付时发出的事件。
+/// 当类型为 `T` 的 coin 支付时发出的事件。
 struct CoinPaymentEvent<phantom T> has drop, store {
     from: address,
     amount: u64,
@@ -213,13 +212,13 @@ struct CoinPaymentEvent<phantom T> has drop, store {
     category: String,
 }
 
-/// 创建代币支付。
+
 public fun create<T>(amount: u64, destination: address, category: String): CoinPayment<T> {
     assert!(amount > 0, error::invalid_argument(EINVALID_AMOUNT));
     CoinPayment<T> { amount, destination, category }
 }
 
-/// 执行代币支付。
+
 public fun execute<T>(minter: &signer, coin_payment: &CoinPayment<T>) {
     let amount = amount(coin_payment);
     let from = signer::address_of(minter);
@@ -240,6 +239,8 @@ public fun execute<T>(minter: &signer, coin_payment: &CoinPayment<T>) {
 }
 ```
 
+
+
 ## 四、风险与缺陷
 
 我们计划使用资源账户将这些合约作为不可变合约部署。不会存储签名者能力，这意味着与部署的合约没有关联的密钥。因此，不同时间部署的模块可以独立进行，并且可以在不同的地址上部署。当创建新模块时，它们将在每次部署时部署到一个独特的资源账户。
@@ -254,4 +255,4 @@ public fun execute<T>(minter: &signer, coin_payment: &CoinPayment<T>) {
 
 ### 2. 未来展望
 
-在建立这一标准的过程中，我们意识到还有其他需要考虑的因素，比如定义半同质代币（SFT）标准，因为目前在 Aptos 中还没有标准。目前，Aptos 的示例 SFT 是属于一个 collection 的代币，但它还具有可分割为资产并作为可分割资产转移的可分割存储的特性。从概念上讲，它是具有额外链上元数据的可分割资产。
+在建立这一标准的过程中，我们意识到还有其他需要考虑的因素，比如定义半同质 token（SFT）标准，因为目前在 Aptos 中还没有标准。目前，Aptos 的示例 SFT 是属于一个 collection 的 token，但它还具有可分割为资产并作为可分割资产转移的可分割存储的特性。从概念上讲，它是具有额外链上元数据的可分割资产。

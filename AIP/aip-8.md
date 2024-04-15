@@ -14,7 +14,7 @@ updated: 2023年1月9日
 
 # AIP-8 - 集合类型的高阶内联函数
 
-## 一、摘要
+## 一、概述
 
 Move 语言在目前的版本里不支持诸如高阶函数（可以作为参数或结果的函数）和动态分发（根据对象类型动态调用对应方法）的特性，因为这些概念在 Move 字节码和虚拟机层面都不受支持。不过，最近 Aptos Move 引入了一个新概念，即*内联函数*，这类函数在编译期就进行展开，因此不在 Move 的字节码中存在。这让它们能实现一项特性，即接受函数作为参数，这些函数可由 lambda 表达式（匿名函数）给出。基于此，我们可以为 Move 的集合类型定义一系列像 'for_each'、'filter'、'map' 和 'fold' 这样的高阶函数。在本次改进提案（AIP）中，我们建议为这些函数制定一系列标准化的约定。
 
@@ -78,15 +78,15 @@ public inline fun map<T, S>(v: vector<T>, f: |T|S): vector<S> {
 
 Aptos 框架中的这些数据类型应该获取高阶函数（待完成）：
 
-- Move 标准库
+- Move stdlib （标准库）
     - vector
     - option
-- Aptos 标准库
+- Aptos stdlib（标准库）
     - simple map
     - ？
-- Aptos 框架
+- Aptos framework（框架）
     - ？
-- Aptos 代币
+- Aptos  tokens
     - property  map
     - ？
 

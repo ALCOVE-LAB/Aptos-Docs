@@ -7,23 +7,25 @@ type: Standard
 created: <12/05/2023>
 ---
 
----
+> [!TIP]
+> 
+> 译者注： 本文中的可替代资产(fungible asset) 和 `FA` 是一个意思，“硬币” 则代表了 `coin`
+> 
+> 原文链接：https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-63.md
+> 
 
-原文链接：https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-63.md
+[TOC]
 
-译者注： 本文中的可替代资产(fungible asset) 和 `FA` 是一个意思，“硬币” 则代表了 `coin`
-
----
 
 # AIP-63 - Coin to Fungible Asset Migration (硬币向可替代资产迁移方案)
 
-## 摘要
+## 一、概述
 [AIP-21](https://github.com/lightmark/AIPs/blob/main/aips/aip-21.md)提出了可替代资产（FA）标准，旨在取代现有的硬币标准，用于链上表达所有形式的可替代资产，包括但不限于传统的硬币。
 随着Aptos生态系统的发展，存在从硬币框架向更先进的可替代资产框架过渡的需求。本提案（AIP）的宗旨是在尽量减小对现有生态系统项目和用户的影响的前提下，实现从硬币向可替代资产的过渡。
 
 该提案制定了一套全面的硬币与可替代资产之间的映射机制，允许`coin`模块中的硬币与其对应的可替代资产互换，并且在可行情况下，将`CoinStore<CoinType>`转换为对应的主要可替代资产存储，以支持这一迁移过程。
 
-### 目标
+### 1. 目标
 
 本提案的目标包括：
 - 向生态系统公开现有硬币对应的FA，以便开发者能够为其DApps和应用程序适配FA（未来将仅支持FA）。诸如DeFi、钱包及其他应用程序可以通过`coin`模块无缝识别FA与等同硬币，并能够等价透明地进行操作。
@@ -36,16 +38,20 @@ created: <12/05/2023>
     - 不对现有链上dapps造成破坏。
     - 尽可能降低dapp开发者和用户的迁移负担，即迁移过程应最小化干扰并尽量透明化。技术层面上，这意味着解决方案应能在用户同时持有同一资产类型的FA和硬币时，实现无缝衔接。
 
-### 不在讨论范围内的内容
+### 2. 不在讨论范围内的内容
 
 - 强制用户将他们的`CoinStore`迁移至`PrimaryFungibleStore`
 - 使APT的FA `PrimaryFungibleStore`成为新账户默认的`CoinStore<AptosCoin>`替代选项。
 
-## 动机
+
+
+## 二、动机
 
 在Aptos网络中DeFi应用广泛接纳之前，启动迁移过程以简化新dapps的部署至关重要。否则，开发者可能需要在两个不同的标准上执行相同的业务逻辑，而资产流动性可能会因此分散，这对于整个Aptos生态系统来说可能是一个沉重且不健康的负担。此外，CeFi应用也有可能面临类似的挑战。当前混乱的局面，即存在多种资产标准，给开发者和用户带来了显著的困扰，这是一个亟需解决的问题。
 
-## 影响
+
+
+## 三、影响
 
 - 硬币创建者：
   - 每种硬币将仅与一种FA类型匹配。原有的权限模型（如`MintCapability`、`FreezeCapability`、`BurnCapability`）将用于生成匹配FA的对应权限引用(`MintRef`、`TransferRef`、`BurnRef`)。
@@ -60,7 +66,9 @@ created: <12/05/2023>
   - 钱包需更新以正确显示余额，结合索引，反映硬币及其匹配FA的总额。
   - 随着迁移完成以及无配对硬币FA的生成，钱包应转向使用FA相关的Move API，如资产转移操作。
 
-## 替代方案
+
+
+## 四、替代方案
 
 1. 手动匹配方案，要求硬币创建者为每种硬币资产手动生成对应FA（如果未存在），并在映射中进行注册。这一方式面临几个问题：
     - 如何处理权限引用(`MintRef`、`TransferRef`、`BurnRef`)？若FA缺乏这些怎么办？
@@ -83,7 +91,9 @@ created: <12/05/2023>
 - 直接解决了资产类型碎片化的问题，这一问题阻碍了FA标准的广泛采用和开发。例如，在余额同时由硬币和FA构成时，对于仅支持FA的DApps可能出现无法正常运作的问题。如用户想要通过使用`fungible_asset::transfer`转移20个APT，但仅有10个APT硬币和10个APT FA时，将导致交易无法成功执行。
 - 选择方案2并未减轻，反而可能增加了工程负担，无论是对内还是对外部开发者而言。从长期角度来看，团队最终仍需要满足本提案中列出的所有条件和需求。
 
-## 规范
+
+
+## 五、规范
 
 `CoinConversionMap`将存储在`@aptos_framework`下：
 ```rust
@@ -158,7 +168,7 @@ fun maybe_convert_to_fungible_store<CoinType>(account: address) acquires CoinSto
     public fun paired_burn_ref<CoinType>(_: &BurnCapability<CoinType>): BurnRef;
 ```
 
-### 案例研究
+### 1. 案例研究
 以APT硬币为例。假设APT硬币和FA已经创建并配对。
 
 1. 在用户删除`CoinStore<AptosCoin>`之前：
@@ -173,41 +183,53 @@ fun maybe_convert_to_fungible_store<CoinType>(account: address) acquires CoinSto
 `coin::register`还没有被弃用，所以有可能在用户删除`CoinStore`后，它会再次被创建。所以在罕见的情况下，案例2可以回到案例1。然而，这个AIP的目标不是要消除这种情况，而是要让生态系统的dapps能够在用户的账户下同时存在同一种资产类型的硬币和FA，并且能够完美地工作。
 关于长期的计划，请参考[未来计划](#future-potential)
 
-## 参考实现
+
+
+## 六、参考实现
 https://github.com/aptos-labs/aptos-core/pull/11224
 
-## 测试（可选）
+
+
+## 七、测试（可选）
 
 通过单元测试进行了彻底的验证。将部署到devnet并手动测试。
 
-## 风险和不足之处
+
+
+## 八、风险和不足之处
 
 - 所有新的Dapp若想通过可替代资产（FA）的Move API与用户互动，都假设用户账户已完成迁移。尚未迁移的账户可能无法与这些Dapp兼容。
 - 那些不在`CoinStore`中的硬币无法通过本AIP自动迁移。人们需要手动完成迁移任务。然而，作为一个框架，我们没法确保了解到这一过程何时彻底结束。
 
-## 未来潜力
 
-### 阶段1
+
+## 九、未来潜力
+
+### 1. 阶段1
 本AIP为迁移计划的初步阶段。意味着，如果用户未主动迁移其`CoinStore`，同时没有通过FA API接入FA，那么从用户角度看，这并无任何操作上的变化。
 
-### 阶段2
+### 2. 阶段2
 所有Dapps、交易所、钱包等都需更新其机制，从仅仅监测`CoinStore`余额，转向同时跟踪`CoinStore`与`PrimaryFungibleStore`余额并显示总和。
 
-### 阶段3
+### 3. 阶段3
 将禁止创建新的`CoinStore`实例。随后会执行以下步骤：
 - 迁移所有现有账户的`CoinStore<AptosCoin>`至APT的`PrimaryFungibleStore`。
 - 在执行任何硬币类型的`Withdraw<CoinType>`和`Deposit<CoinType>`函数时，内部触发迁移流程。这样，在用户与这些资产进行交互时，可以间接帮助实现其他硬币类型的迁移。
 
-### 阶段4
+### 4. 阶段4
 当绝大部分资产均已迁移至FA之后，我们将需要提出新的AIP来禁止新硬币的生成，鼓励整个生态系统基于FA模块API发展，并淘汰旧的硬币模块。
 
-## 时间线
 
-### 建议的实施/部署时间线
+
+## 十、时间线
+
+### 1. 建议的实施/部署时间线
 预计于v1.10版本完成，预期与2024年第一季度的v1.10/v1.11版本一同发布。
 
-### 建议的开发者平台支持时间表
+### 2. 建议的开发者平台支持时间表
 计划在2024年第一季度推出支持。
 
-## 安全性顾虑
+
+
+## 十一、安全性顾虑
 代码需经过严格的安全审核。

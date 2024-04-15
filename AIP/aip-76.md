@@ -15,7 +15,7 @@ requires: "AIP-10: Move对象"，"AIP-11:  token 对象"，"AIP-21: 通用资产
 
 # AIP-76 - 可组合数字资产标准
 
-## 一、摘要
+## 一、概述
 
 本 AIP 提出一个特定目的的、可扩展的组合性框架，允许创作者为动态个人资料图片（PFP）、可组合的游戏资产以及其他需要组合性的丰富应用创建 NFT。它通过基于`AIP-11`和`AIP-10`的对象模型引入新的业务逻辑、子功能、数据结构和API，同时利用`AIP-22`的无代码特性以及`AIP-21`中与可替代资产的组合性自由。 
 
@@ -67,7 +67,7 @@ requires: "AIP-10: Move对象"，"AIP-11:  token 对象"，"AIP-21: 通用资产
 
 下面是使用 `aptos-token` 的 `hero.move` 的可视化示例：
 
-![Alt text](https://mielgo-markdown.oss-cn-chengdu.aliyuncs.com/6.png)
+![](../static/aip_images/[aip-76]existing_solutions.pnG)
 
 > ℹ️ 图2：*使用 `AIP-22` 的 hero.move*
 
@@ -131,7 +131,9 @@ requires: "AIP-10: Move对象"，"AIP-11:  token 对象"，"AIP-21: 通用资产
 该解决方案支持使用 `AIP-11` 中引入的 `ExtendRef` 能力在创建后添加新资源，从而灵活地为 token 添加额外资源。这有助于通过资源自定义元数据。然后，`property_map`可以用来存储 token 的静态元数据，资源可以用来存储 token 的动态元数据。例如：`property_map` 可以存储剑的类型：“木制”，资源可以存储剑的力量：“100”。
 此外，框架层次结构的多层结构在其第三层中包括对 `DA` 的支持，允许所有 `aptos-token` 和开发者向框架添加更多层次。
 
-![Alt text](https://mielgo-markdown.oss-cn-chengdu.aliyuncs.com/7.png)
+
+
+![](../static/aip_images/[aip-76]data_accessibility.png)
 
 > ℹ️ 图 4：*使用提议标准的 hero.move*
 

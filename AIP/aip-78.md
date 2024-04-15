@@ -14,7 +14,7 @@ updated (*optional): <mm/dd/yyyy>
 
 # AIP-78 - Aptos Token对象框架更新
 
-## 一、概要
+## 一、概述
 
 本AIP旨在扩展`aptos-token-objects`框架中的`collection`、`token`和`property_map`模块。其目的是为 collection 和 token 对象引入可扩展性和自定义性。
 

@@ -15,7 +15,7 @@ requires (*optional): N/A
 
 # AIP-55 - 泛化交易认证并支持任意 K-of-N 多密钥账户
 
-## 一、概要
+## 一、概述
 
 提交给 Aptos 的交易包含一个 `RawTransaction` 和一个 `TransactionAuthenticator`。`TransactionAuthenticator` 授权执行交易的是交易内的账户的发送者（senders）或审批者（approvers）集合（set）。`TransactionAuthenticator` 包含一组通用的认证器，称为 `AccountAuthenticators`，用于费用支付和多代理，以及一些非常特定的类型，用于单个发送者交易，如 Ed25519、MultiEd25519 和 Secp256k1。因此，添加新的用于授权交易的加密证明需要一个新的 `TransactionAuthenticator`、`AccountAuthenticator` 和专门的加密认证器。
 

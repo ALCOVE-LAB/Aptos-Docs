@@ -12,7 +12,7 @@ created: 02/22/2024
 
 # AIP-71 - 使用模块事件重构 Aptos 框架事件
 
-## 一、概要
+## 一、概述
 
 这个AIP提出了一个迁移计划，将 Aptos 框架中的所有句柄（handle）事件（event v1）迁移到模块（module）事件（event v2），并添加新的事件。
 

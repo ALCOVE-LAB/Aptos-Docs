@@ -11,7 +11,7 @@ created: 03/24/2023
 
 # AIP-23 - 使 Ed25519 公钥验证原生函数在密钥长度错误时返回`false`
 
-## 一、摘要
+## 一、概述
 
 更改原生Move函数`native fun pubkey_validate_internal`使用的`native_public_key_validate`函数，使其在提供的公钥长度不正确时返回`false`。在此之前，如果提供的密钥长度不正确，该函数会中止。此更改通过功能标志进行控制。
 

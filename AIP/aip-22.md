@@ -15,7 +15,7 @@ requires: [AIP-11](Tokens as Objects)
 
 # AIP-22 - 无代码数字资产（Token 对象）
 
-## 一、概要
+## 一、概述
 
 本 AIP 提出了围绕 Token 对象的框架，使开发人员可以在不编写任何 Move 代码的情况下创建 token 和 collection 。它为业务逻辑、数据布局上提供了决策，并且提供了必要的入口功能函数。
 
@@ -46,15 +46,15 @@ requires: [AIP-11](Tokens as Objects)
 
 这是第一次尝试定义无代码（no-code）解决方案。对象模型使得我们能够创建新的无代码解决方案，并且对于大部分用户来说，这些解决方案与既有的使用体验无异，唯有那些寻求新特性的用户才能感受到差别。事实上，这些解决方案能够与现有方案并行运作。举个例子，如果可替代性或者半可替代性成为重要需求时，我们应当提出一个关于可替代性的新的无代码方案，并将其整合进 Aptos 的框架之中。
 
-另一个选择是不在框架中设置它，而是建立一个固定不变的合约。在这个范畴里，最主要的担忧是可能出现的错误，或者是这种特殊无代码代币可能需要的附加功能。
+另一个选择是不在框架中设置它，而是建立一个固定不变的合约。在这个范畴里，最主要的担忧是可能出现的错误，或者是这种特殊无代码 token 可能需要的附加功能。
 
 ## 四、规范
 
 无代码解决方案由三个组件组成：
 
 1. *AptosCollection* - 集合的封装。
-2. *AptosToken* - 代币的封装。
-3. *PropertyMap* - 用于代币的通用元数据。
+2. *AptosToken* -  token 的封装。
+3. *PropertyMap* - 用于 token 的通用元数据。
 
 ### 1. AptosCollection
 
@@ -63,13 +63,13 @@ requires: [AIP-11](Tokens as Objects)
 * 指定整个 collection 的 royalty 。
 * 确定所有 token 字段（描述、名称和 URI）的可变性。
 * 确定 token 是否可冻结（freezable）或销毁（burnable）。
-* 允许在生成后创建或变更代币属性。
+* 允许在生成后创建或变更 token 属性。
 
 AptosCollection 利用了 `FixedSupply` 并限制了可创建的 token 数量。这不够灵活，并且在之后无法调整。
 
 ### 2. AptosToken
 
-collection 层主要决策 AptosToken。在代币生成期间，框架会审查 AptosCollection，以适当地从代币获取 `ref` 供以后使用，这包括变更、销毁和转移 `ref`。
+collection 层主要决策 AptosToken。在 token 生成期间，框架会审查 AptosCollection，以适当地从 token 获取 `ref` 供以后使用，这包括变更、销毁和转移 `ref`。
 
 collection 层为 AptosToken 做出了大部分决策。在 token 生成过程中，框架会审查 AptosCollection 以适当地获取 token 的 `ref`，以便后续使用，这包括变更（mutation）、销毁（burn）和转移`ref`（transfer `ref`）。
 

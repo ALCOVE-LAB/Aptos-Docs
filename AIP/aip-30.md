@@ -14,9 +14,9 @@ updated (*optional): 7/28/2023
 
 # AIP-30 - 实施降低质押奖励
 
-## 一、概要
+## 一、概述
 
-在[Aptos代币经济概览](https://aptosfoundation.org/currents/aptos-tokenomics-overview)中，Aptos Foundation 介绍了随时间变化的预期代币供应变化。目前，最高的质押奖励率是一个恒定的年化率 $7\%$；该AIP提议每年将质押奖励降低1.5%，以符合Aptos的代币经济：
+在[Aptos token 经济概览](https://aptosfoundation.org/currents/aptos-tokenomics-overview)中，Aptos Foundation 介绍了随时间变化的预期 token 供应变化。目前，最高的质押奖励率是一个恒定的年化率 $7\%$；该AIP提议每年将质押奖励降低1.5%，以符合Aptos的 token 经济：
 
 - 最大奖励率每年下降1.5%，直到年化率降至3.25%的下限（预计需要超过50年）。
 
@@ -26,11 +26,13 @@ updated (*optional): 7/28/2023
 - 第3年的最大奖励率：$7\% * (100\%-1.5\%)^2 = 6.791575\%$
 - ...
 - 第51年的最大奖励率：$7\% * (100\%-1.5\%)^50 \approx 3.28783\%$
-- 第52年的最大奖励率：$max(3.25\%, 7\% * (100\%-1.5\%)^{51}) = 3.25\%$
+- 第52年的最大奖励率：$max(3.25\%, 7\% * (100\%-1.5\%)^{51}) = 3.25\%$​
+
+
 
 ## 二、动机
 
-完全符合[Aptos代币经济概览](https://aptosfoundation.org/currents/aptos-tokenomics-overview)。
+完全符合[Aptos token 经济概览](https://aptosfoundation.org/currents/aptos-tokenomics-overview)。
 
 
 
@@ -45,13 +47,19 @@ updated (*optional): 7/28/2023
 
 1. 我们可以在一年中逐渐降低奖励（例如，每30天），但这将使奖励计算更加复杂。
 
+
+
 ## 四、参考实现
 
 [https://github.com/aptos-labs/aptos-core/pull/7867](https://github.com/aptos-labs/aptos-core/pull/7867)
 
+
+
 ## 五、未来潜力
 
 所有奖励和奖励机制也可以通过链上治理进行修改
+
+
 
 ## 六、建议的实施时间表
 

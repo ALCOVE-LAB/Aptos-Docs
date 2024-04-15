@@ -11,7 +11,7 @@ created: 07/20/2023
 
 # AIP-44 - 模块事件
 
-## 一、摘要
+## 一、概述
 
 本改进提案（AIP）定义了一个模块级（Module-level）事件框架，其目标是替换掉目前使用的实例（Instance）事件框架。新的事件框架不再使用实例事件的 `EventHandle` 来操作，而是为每个事件流匹配一个固定的结构类型。
 
@@ -53,7 +53,7 @@ created: 07/20/2023
 模块事件示例:
 
 ```rust
-/// 一个示例模块事件结构，表示一次代币转账。
+/// 一个示例模块事件结构，表示一次 coin 转账。
 #[event]
 struct TransferEvent<Coin> has store, drop {
   sender: address,

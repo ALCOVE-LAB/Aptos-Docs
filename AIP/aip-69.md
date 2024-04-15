@@ -14,7 +14,7 @@ requires (*optional): 67
 
 # AIP-69 - 开始在链上复制 Google JWK
 
-## 一、概要
+## 一、概述
 
 该 AIP 提议开始使用[原生的 JWK 共识框架](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md)，在链上复制  [在 Google API 中可用的 ](https://accounts.google.com/.well-known/openid-configuration) Google JWK。
 

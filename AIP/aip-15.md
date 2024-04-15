@@ -1,6 +1,6 @@
 ---
 aip: 15
-title: 代币标准保留属性
+title: token 标准保留属性
 author: areshand
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/28
 Status: Accepted
@@ -66,4 +66,4 @@ public(friend) fun update_non_framework_reserved_properties(map: &mut PropertyMa
 
 ## 七、参考资料
 
-- [代币标准](https://aptos.dev/concepts/coin-and-token/aptos-token/)
+- [token 标准](https://aptos.dev/concepts/coin-and-token/aptos-token/)

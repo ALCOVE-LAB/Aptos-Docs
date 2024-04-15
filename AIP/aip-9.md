@@ -15,7 +15,7 @@ requires: N/A
 
 # AIP-9 - 资源组
 
-## 一、摘要
+## 一、概述
 
 本 AIP 提议资源组（resource group）支持将多个不同的 Move 资源一起存储到单个存储插槽中（a single storage slot）。
 

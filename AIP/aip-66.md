@@ -15,7 +15,7 @@ requires (*optional): <AIP number(s)>
 
 # AIP-66 - 通行证账户
 
-## 一、摘要
+## 一、概述
 
 本AIP提议了 Aptos 的首个 [WebAuthn](https://www.w3.org/TR/webauthn-3/) 验证器，使用户能够使用通行证（passkeys）和其他 WebAuthn 凭据进行交易认证。
 
