@@ -33,7 +33,7 @@ requires: "AIP-9: Resource Groups"
 - `ExtendRef `允许持有者访问签名者，以添加新资源。
 - `TransferRef` 允许持有者在创建后将新资源转移到对象。
 
-如果代币存在，存储在一个模块内的 `DeleteRef` 能让创建者或持有者销毁该代币。而 `TransferRef` 无论是在模块内用于定义决定对象何时及通过谁来转移的逻辑，还是赠送（be given away）并将其视为一个能力来转移对象。
+如果 token 存在，存储在一个模块内的 `DeleteRef` 能让创建者或持有者销毁该 token 。而 `TransferRef` 无论是在模块内用于定义决定对象何时及通过谁来转移的逻辑，还是赠送（be given away）并将其视为一个能力来转移对象。
 
 此外，对象还实现了对象的可组合性，允许对象拥有其他对象。每个对象都在其状态中存储其所有者的身份。所有者可以通过创建并将 `Object<T>` 存储在自己的存储空间中来跟踪其拥有的对象。从而在对象模型内实现无缝的双向导航（seamless bi-directional navigation ）。
 

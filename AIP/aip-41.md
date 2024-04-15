@@ -19,7 +19,7 @@ requires (*optional): <AIP number(s)>
 
 **版本:** 1.2
 
-## 一、概要
+## 一、概述
 
 > 包含一个简短的描述，总结了拟议的更改。这应该不超过几句话。
 
@@ -29,7 +29,11 @@ requires (*optional): <AIP number(s)>
 
 已经提出的 `randomness` 模块采用了一个由 Aptos 的验证者所执行的 *链上加密随机性实现*（on-chain cryptographic randomness implementation）。然而，该实现**并不包含在**这份 AIP 的讨论范围之内，而将成为未来另一份 AIP 的重点。
 
-==**TODO:** *在此处链接到on-chain随机性实现AIP*。==
+**TODO:** *在此处链接到on-chain随机性实现AIP*。
+
+> [!TIP]
+>
+> 原文未提供链接
 
 本AIP唯一假设的 *链上加密随机性实现* 是**不可偏倚的**和**不可预测的**，即使被一小部分恶意的验证者（按权益weighed权重stake）控制。
 

@@ -12,7 +12,7 @@ created: 08/13/2023
 
 # AIP-45 - 用户拥有对象的安全销毁
 
-## 一、概要
+## 一、概述
 
 作为对象的副产品，用户在 Aptos 上的账户地址可能会不小心关联到一些他们不想要的、“粘附”于账户的不可转移内容。目前，Aptos 的大多数应用都会把与某个账户相关联的所有[数字资产](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-11.md)和[可替代资产（Fungible Assets）](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-21.md)展示给账户持有人及其他浏览该账户的人。由于有些对象被设定为不可删除的，也称为“灵魂绑定（soul bound）”，使得用户可能会接收到他们不想要的空投。为了解决这个问题，我们建议采用一种机制，允许用户自行将任何他们拥有的对象发送到一个公用的销毁地址。
 

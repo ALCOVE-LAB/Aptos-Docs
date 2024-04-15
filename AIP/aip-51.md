@@ -12,7 +12,7 @@ created: 10/3/2023
 
 # AIP-51 - 更改运营者（operators）的受益人
 
-## 一、摘要
+## 一、概述
 
 目前，运营商佣金会发送到运营者自己的地址。我们收到了多个请求 —— 希望能够为不同的受益人设置独立的地址。例如，当运营者希望他们的佣金进入冷存储钱包（cold storage wallet）时，同时使用他们的运营地址进行日常的操作。此功能适用于质押合约（the staking contrac）、委托质押合约（the delegated staking contract）和锁定合约（the vesting contract）。
 
@@ -27,7 +27,7 @@ created: 10/3/2023
 
 ### 2 不在范围内
 
-本 AIP 不涉及更改代币（Token）所有者（例如，质押者、委托人）的受益人。
+本 AIP 不涉及更改 Token 所有者（例如，质押者、委托人）的受益人。
 
 ### 3. 影响
 

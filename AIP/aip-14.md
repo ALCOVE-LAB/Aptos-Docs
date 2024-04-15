@@ -21,6 +21,8 @@ updated: 2023/02/10
 
 目前的奖励计算方法是基于底层质押合约`staking_contract` 记录的本金，这个记录会在每次执行质押合约的请求佣金函数`staking_contract::request_commission` 时进行更新。
 
+
+
 ## 二、提议
 
 通过质押合约（staking_contract）的本金来计算奖励的方法比较间接。理想的方式是，锁仓合约（vesting_contract）使用剩余的授权资金额作为基础，以此来计算迄今为止累积的实际奖励金额。下面通过一个例子来进一步说明这个概念：
@@ -30,9 +32,13 @@ updated: 2023/02/10
 3. 在向锁定池计算尚未支付的奖励前，`vesting::unlock_rewards` 首先要求支付给运营商佣金，即 5 APT（级赚取的 50 APT 的10%）。剩余的总活跃质押金额为145 APT，全部属于契约锁定池。
 4. 鉴于目前还没有 token 被锁定，当前的 `vesting::unlock_rewards`  将计算尚未结算的奖励，以分配给权益池的参与者。计算公式为：`145(总活跃份额 total active in stake pool) - 100（未分配的份额 remaining_grant）= 45`。
 
+
+
 ## 三、参考实现
 
 https://github.com/aptos-labs/aptos-core/pull/6106
+
+
 
 ## 四、时间安排
 

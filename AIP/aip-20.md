@@ -10,8 +10,9 @@ AIP: 20
 
 [TOC]
 
+# AIP-19 - 通用密码学代数和 BLS12-381 实现
 
-## 一、摘要
+## 一、概述
 
 本 AIP 提议在 Aptos 标准库中支持通用密码学代数操作。
 
@@ -20,6 +21,8 @@ AIP: 20
 支持的代数结构初始列表包括 BLS12-381 中使用的群 / 域，这是一种流行的配对友好曲线，如[此处](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-11#name-bls-curves-for-the-128-bit-)所述。
 
 未来的 AIP 可以扩展到操作列表或结构列表中。
+
+
 
 ## 二、动机
 
@@ -51,6 +54,8 @@ AIP: 20
 
 在后端，通用 API 的本地函数实现了动态调度：它们根据给定的标记类型进行操作。
 例如，在 BLS12-381 的上下文中，对于 `add<S>(x: &Element<S>, y:&Element<S>): Element<S>` 的本地函数将计算 `x*y`（如果 `S` 是代表 BLS12-381 中的乘法子群 `Gt`），或者计算 `x+y`（如果 `S` 是标量域 `Fr`）。这是通用 API 设计所必需的。
+
+
 
 ## 四、规范
 

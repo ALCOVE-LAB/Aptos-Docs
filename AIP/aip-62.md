@@ -9,19 +9,21 @@ type: Standard
 created: 29/01/2024
 ---
 
----
+> [!TIP]
+> 译者注：
+> 原文链接：https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-62.md
 
-原文链接：https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-62.md
-
----
+[TOC]
 
 # AIP-62 - Wallet Standard (钱包标准)
 
-## 摘要
+## 一、概述
 
 钱包标准定义了钱包与 dapp 之间的通用 API 交互模式。此 AIP 引入了一个为 Aptos 生态系统量身定制的新钱包互操作标准。
 
-## 动机
+
+
+## 二、动机
 
 当前大部分网络钱包采用浏览器扩展形式，通过注入脚本到全局窗口对象中，并期望 dapp 通过这一对象来感知它们的存在，以实现与 dapp 的交互。然而，此做法存在几个问题：
 
@@ -37,7 +39,9 @@ created: 29/01/2024
 
 本提案推荐在 Aptos 钱包与 dapp 之间引入基于事件的通讯模式，以消除上述的各类问题。
 
-## 影响
+
+
+## 三、影响
 
 1. Dapp 开发者需：
 
@@ -52,11 +56,15 @@ created: 29/01/2024
 - 注册自己的钱包，确保其能够被 dapp 正确发现
 - 按照新标准实施符合 Aptos 钱包协议的 AptosWallet 类
 
-## 核心概念
+
+
+## 四、核心概念
 
 此[链无关的解决方案](https://github.com/wallet-standard/wallet-standard)已作为钱包与 dapps 通信的通用标准而推出，并已经在 [Solana](https://github.com/wallet-standard/wallet-standard) 及 [Sui](https://docs.sui.io/standards/wallet-standard) 获得实施，而 [Ethereum](https://eips.ethereum.org/EIPS/eip-6963) 社群最近也提出了相似的解决思路。
 
-## 规范详情
+
+
+## 五、规范详情
 
 [钱包互操作标准](https://github.com/aptos-labs/wallet-standard)提出了一系列区块链网络无关的接口与协议，目的是为了优化应用程序与注入式钱包之间的互动体验。
 
@@ -224,7 +232,9 @@ if (error) {
 }
 ```
 
-## 参考实现
+
+
+## 六、参考实现
 
 该标准公开了一个[detect](https://github.com/aptos-labs/wallet-standard/blob/main/src/detect.ts#L17)功能，通过验证钱包中是否存在必需的函数来检测现有的钱包是否符合Aptos标准。这些函数被称为[features](https://github.com/aptos-labs/wallet-standard/tree/main/src/features)。每个特性应以 `aptos` 命名空间、`colon` 和 `{method}` 名称定义，即 `aptos:connect`。
 
@@ -333,11 +343,15 @@ const onConnect = () => {
 };
 ```
 
-## 风险和缺点
+
+
+## 七、风险和缺点
 
 新的标准使用了[新的TypeScript SDK](https://github.com/aptos-labs/aptos-ts-sdk)类型，因此要求dapps和钱包使用/迁移到新的TypeScript SDK，或者持有从新的TypeScript SDK类型到旧的TypeScript SDK类型的转换层。
 
-## 未来潜力
+
+
+## 八、未来潜力
 
 该解决方案作为一个通用的实现，已被多种链和钱包采用，并有潜力被更广泛的项目所接受。因此，钱包从一个区块链迁移到另一个的工作量极小。同时，支持多链的 dApps 能够轻松识别遵循此标准的全部钱包。
 
@@ -345,13 +359,17 @@ const onConnect = () => {
 
 任何未来的新功能或改进都应避免导入破坏性更改，这是因为每个钱包都运行其私有的插件代码，并在独立的上下文中实现各项功能。
 
-## 时间线
 
-### 建议的实施时间线
+
+## 九、时间线
+
+### 1. 建议的实施时间线
 
 一旦 AIP（Aptos Improvement Proposal）获得批准，dapps 和钱包就应开始实施必要的更改（如“参考实现”部分所述），以遵循新标准。
 
-## 安全考量
+
+
+## 十、安全考量
 
 新的发现机制旨在减轻 dApps 在安装及维护不同钱包包时面临的责任，进一步降低了供应链攻击的风险。
 
