@@ -26,13 +26,19 @@ requires (*optional): <AIP编号>
 
 这是 [无私钥账户](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md) 基础架构的基本构建块。
 
+
+
 ## 二、动机
 
 这是 [无私钥账户](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md) 基础架构的基本构建块。
 
+
+
 ## 三、影响
 
 DApp/SDK 开发人员需要实现与 pepper 服务的交互，以支持无私钥流程。
+
+
 
 ## 四、替代方案
 
