@@ -1,19 +1,19 @@
 ---
 aip: 83
 title: 框架级不可转让对象
-author: davidiw,
-discussions-to (*可选): <指向官方讨论线程的URL>
-状态：草案
-类型: 框架
-创建日期：04/27/2024
-更新日期 (*可选): <mm/dd/yyyy>
-需要：21
-
+author: 
+  - name: davidiw
+discussions-to: <指向官方讨论线程的URL>
+Status: 草案
+type: 框架
+created: 04/27/2024
+updated: <mm/dd/yyyy>
+requires: 21
 ---
 [TOC]
 
 
-# AIP-82 - 框架级不可转让的可替代资产存储
+# AIP-83 - 框架级不可转让的可替代资产存储
 
 ## 一、摘要
 

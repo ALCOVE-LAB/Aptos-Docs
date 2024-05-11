@@ -1,14 +1,16 @@
 ---
 aip: 81
-title: 无私钥账户的 Pepper 服务
-author: 马周军（zhoujun@aptoslabs.com）
-discussions-to (*optional): <指向官方讨论主题的网址>
-Status: 草案
-last-call-end-date (*optional): <留下反馈和评论的最后日期>
-type: <标准（核心、网络、界面、应用、框架）| 信息 | 过程>
-created: 2024年3月17日
-updated (*optional): <更新日期>
-requires (*optional): <AIP编号>
+title: 为无密钥账户提供 Pepper 服务
+author: 
+  - name: Zhoujun Ma
+    email: zhoujun@aptoslabs.com
+discussions-to: "<指向官方讨论主题的 URL>"
+status: 起草中
+last-call-end-date: "<最后留下反馈和评论的日期 (mm/dd/yyyy)>"
+type: 标准 (核心, 网络, 接口, 应用, 框架) | 信息性 | 流程
+created: 2024-03-17
+updated: "<更新日期 (mm/dd/yyyy)>"
+requires: "<AIP 号码>"
 ---
 
 [TOC]

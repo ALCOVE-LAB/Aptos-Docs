@@ -1,14 +1,16 @@
 ---
 aip: 75
 title: 无密钥账户的证明服务
-author: Rex Fernando (rex.fernando@aptoslabs.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/379
-Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
-type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
-created: 03/13/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): 61
+author: 
+  - name: Rex Fernando
+    email: rex.fernando@aptoslabs.com
+discussions-to: "https://github.com/aptos-foundation/AIPs/issues/379"
+status: 起草中
+last-call-end-date: "<最后留下反馈和评论的日期 (mm/dd/yyyy)>"
+type: 标准 (核心, 网络, 接口, 应用, 框架) | 信息 | 流程
+created: 2024-03-13
+updated: "<更新日期 (mm/dd/yyyy)>"
+requires: 61
 ---
 
 [TOC]

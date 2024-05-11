@@ -1,13 +1,20 @@
 ---
 aip: 82
-标题：交易上下文扩展
-作者：junkil-park (https://github.com/junkil-park), lightmark (https://github.com/lightmark), movekevin (https://github.com/movekevin)
-讨论至（*可选）：<a 指向官方讨论帖的URL>
-状态：草稿
-最后呼吁反馈日期（*可选）：<mm/dd/yyyy 留下反馈和评论的最后一天>
-类型：标准（框架）
-创建日期：2024年4月2日
-更新（*可选）：<mm/dd/yyyy>
+title: 交易上下文扩展
+author: 
+  - name: junkil-park
+    url: https://github.com/junkil-park
+  - name: lightmark
+    url: https://github.com/lightmark
+  - name: movekevin
+    url: https://github.com/movekevin
+discussions-to: <指向官方讨论帖的URL>
+status: 草稿
+last-call-end-date: <mm/dd/yyyy 最后留下反馈和评论的日期>
+type: 标准 (框架)
+created: 2024-04-02
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 [TOC]

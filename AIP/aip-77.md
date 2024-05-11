@@ -1,19 +1,23 @@
 ---
 aip: 77
-title: 多签名 V2 增强
-author: junkil-park (https://github.com/junkil-park),  movekevin (https://github.com/movekevin) 
-discussions-to (*可选): https://github.com/aptos-foundation/AIPs/issues/409 
-状态：草案
-最后征求意见结束日期 (*可选): <mm/dd/yyyy 留下反馈和审查的最后一天>
-类型: 标准（框架）
-创建日期：3/28/2024
-更新日期 (*可选): <mm/dd/yyyy>
-需要 (*可选): <AIP编号(s)>
+title: 多重签名 V2 增强
+author: 
+  - name: junkil-park
+    url: https://github.com/junkil-park
+  - name: movekevin
+    url: https://github.com/movekevin
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/409
+status: 草稿
+last-call-end-date: <mm/dd/yyyy 最后留下反馈和评论的日期>
+type: 标准 (框架)
+created: 2024-03-28
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 [TOC]
 
-# AIP-77 - 多签名 V2 增强
+# AIP-77 - 多签 V2 增强
 
 ## 一、摘要
 

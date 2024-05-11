@@ -1,17 +1,18 @@
 ---
 aip: 73
-title: 可分派令牌标准
-author: 周润天
-discussions-to (*可选): https://github.com/aptos-foundation/AIPs/issues/374
-Status: 审查中
-last-call-end-date (*可选): 04/08/2024
+title: 可分派代币标准
+author: 
+  - name: Runtian Zhou
+discussions-to: "https://github.com/aptos-foundation/AIPs/issues/374"
+status: 审查中
+last-call-end-date: 04/08/2024
 type: 框架
-created: 03/08/2024
+created: 2024-03-08
 ---
 
 [TOC]
 
-# AIP-73 - 可分派令牌标准
+# AIP-73 - 可调度 token 标准
 
 ## 一、摘要
 
