@@ -1,14 +1,16 @@
 ---
-AIP: 80
-标题：标准化私钥
-作者：Greg Nazario - greg@aptoslabs.com
-讨论地址（可选）：https://github.com/aptos-foundation/AIPs/issues/405
-状态：草案
-最终征求意见截止日期（可选）：2024年4月30日
-类型：标准（生态系统）
-创建日期：2024年4月19日
-更新日期（可选）：2024年4月19日
-所需内容（可选）：N/A
+aip: 81
+title: 无密钥账户的Pepper服务
+author: 
+  - name: Zhoujun Ma
+    email: zhoujun@aptoslabs.com
+discussions-to: <指向官方讨论帖的URL>
+status: 草稿
+last-call-end-date: <mm/dd/yyyy 最后留下反馈和评论的日期>
+type: <标准 (核心, 网络, 接口, 应用, 框架) | 信息 | 过程>
+created: 2024-03-17
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 [TOC]

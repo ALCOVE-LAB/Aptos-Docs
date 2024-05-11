@@ -1,14 +1,13 @@
 ---
 aip: 78
-title: Aptos Token对象框架更新
+title: Aptos Token Objects 框架更新
 author: johnchanguk
-discussions-to (*optional):
-Status: In Review
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
-type: Framework
-created: 03/23/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+discussions-to: ""
+status: 审查中
+last-call-end-date: "<最后留下反馈和评论的日期 (mm/dd/yyyy)>"
+type: 框架
+created: 2024-03-23
+updated: "<更新日期 (mm/dd/yyyy)>"
 ---
 
 [TOC]

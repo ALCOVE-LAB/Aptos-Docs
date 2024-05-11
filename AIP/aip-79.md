@@ -1,30 +1,36 @@
 ---
 aip: 79
 title: 实现即时链上随机性
-author: Alin Tomescu（alin@aptoslabs.com），Zhuolun "Daniel" Xiang（daniel@aptoslabs.com），Zhoujun Ma（zhoujun@aptoslabs.com）
-discussions-to (*optional): <指向官方讨论线程的网址>
-状态: 起草
-last-call-end-date (*optional): <mm/dd/yyyy 最后留下反馈和评论的日期>
-类型: 标准（核心，网络，框架）
-created: 02/12/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP编号>
+author: 
+  - name: Alin Tomescu
+    email: alin@aptoslabs.com
+  - name: Zhuolun "Daniel" Xiang
+    email: daniel@aptoslabs.com
+  - name: Zhoujun Ma
+    email: zhoujun@aptoslabs.com
+discussions-to: "<指向官方讨论主题的 URL>"
+status: 起草中
+last-call-end-date: "<最后留下反馈和评论的日期 (mm/dd/yyyy)>"
+type: 标准 (核心, 网络, 框架)
+created: 2024-02-12
+updated: "<更新日期 (mm/dd/yyyy)>"
+requires: "<AIP 号码>"
 ---
 
 [TOC]
 # AIP-79 - 实现即时链上随机性
 
-## 一、概要
+## 一、摘要
 
 本 AIP 展示了在 Aptos 区块链上根据 AIP-41[^aip-41] 实施的随机性 API，其目标是为 Move 智能合约提供接入 (1) **立即生成的**，(2) **无偏差的** 以及 (3) **不可预知的** 随机性。这种随机性基于保障区块链自身安全的股权证明（PoS, Proof-of-Stake）的假设。实现同时需要高效，即对区块链系统的吞吐量或者延迟的影响极小。AIP 主要聚焦于链上随机性协议的描述与实施，及其与高效区块链系统的集成细节。具体地，我们介绍了在 PoS（权益证明）环境下，如何实施一种加权的分布式密钥生成（DKG, Distributed Key Generation）协议，使得在验证节点间建立阈值密钥，并且让验证节点利用它们的密钥以及一个加权的可验证不可预测函数（VUF, Verifiable Unpredictable Function）在每个区块生成随机数。我们也将描述如重构变更和 Aptos 虚拟机（VM）变动等其他主要的系统更新。 
 
-### 1. 不在范围内
+### 1. 不在讨论范围内的内容
 
 密码学方案的正式描述及其安全性论证不在此范围内，因为它们已在我们的论文[^DPTX24e]中描述了。
 
 随机性 API 规范及其设计原理不在此范围内，因为它们已在AIP-41[^aip-41]中详细介绍了。
 
-本AIP侧重于如何将密码学原语集成到 Aptos 区块链系统中，构建端到端的即时链上随机性系统。
+本 AIP 侧重于如何将密码学原语集成到 Aptos 区块链系统中，构建端到端的即时链上随机性系统。
 
 
 
@@ -40,7 +46,9 @@ requires (*optional): <AIP编号>
 链上随机性与由验证节点运行的区块链协议之间的互动会影响后者。因此，这两者的设计需精密配合，以确保系统的性能表现，特别是在减少延迟方面。通过在 previewnet 进行的性能测试表明，我们的实现在各种压力测试下仅对整体交易处理时间增加了微小的延迟（数十毫秒）。
 
 **生态系统影响**。
-下游应用程序，如索引器和 SDK，需要支持此实现添加的新事务类型，如[新交易类型](#新交易类型)中所述。
+下游应用程序，如索引器和 SDK，需要支持此实现添加的新事务类型，如[新交易类型](#2. 新交易类型)中所述。
+
+
 
 ## 四、替代解决方案
 
@@ -60,7 +68,7 @@ requires (*optional): <AIP编号>
 
 ## 五、规范
 
-链上随机性给当前的 Aptos 验证节点带来了多项变动，包括每个时期更换时都会执行一次 DKG，改动原有的重配置过程，并为每个区块生成一个**随机性种子**。本部分将概述介绍上述系统的改变。具体的实施细节，请参考[参考实现](#参考实现)章节。
+链上随机性给当前的 Aptos 验证节点带来了多项变动，包括每个时期更换时都会执行一次 DKG，改动原有的重配置过程，并为每个区块生成一个**随机性种子**。本部分将概述介绍上述系统的改变。具体的实施细节，请参考[参考实现](#六、参考实现)章节。
 
 ### 1. Aptos 区块链背景
 
@@ -68,11 +76,13 @@ Aptos 是一款通过**权益证明（PoS）**机制运行的区块链，其共�
 
 此外，该区块链将**共识**过程（当前采用名为 [Jolteon](https://arxiv.org/abs/2106.10362) 的 BFT 共识协议）和**执行**过程（采用名为 [BlockSTM](https://medium.com/aptoslabs/block-stm-how-we-execute-over-160k-transactions-per-second-on-the-aptos-blockchain-3b003657e4ba) 的乐观并发控制执行引擎）进行了分离。在这种机制中，每个区块会先经过共识过程最后确认，然后通过执行过程更新区块链的状态。这种共识与执行的分离设计对于链上随机性来说极为重要，因为它允许网络在计算并最终公布随机数之前，先达成对交易的排序，从而确保所生成的随机数既不可预知也无法被操控。
 
+
+
 ### 2. 设计概述
 
 这一部分将向你宏观地介绍设计的实现，涉及的内容包括密文原始算法，加权分配式密钥生成机制以及随机数生成过程。 
 
-Aptos 的链上随机性机制首先会将各验证节点的权益简化为更小的 *权重*，以确保在权益证明机制的安全框架内提高效率。关于具体的权益简化细节，请参阅["权益简化"](#stake-rounding)。为了本节的讨论，我们假设验证器已经按照权益简化处理得到了相应的权重分配。
+Aptos 的链上随机性机制首先会将各验证节点的权益简化为更小的 *权重*，以确保在权益证明机制的安全框架内提高效率。关于具体的权益简化细节，请参阅["权益简化"](#1. 权益简化)。为了本节的讨论，我们假设验证器已经按照权益简化处理得到了相应的权重分配。
 
 
 
@@ -135,7 +145,7 @@ DKG 的目标是使验证者共同生成一个**共享的密钥**，该密钥将
 
 本节详细描述了每个组件的实现，包括权益舍入、新的交易类型、重新配置相关的更改、DKG 相关的更改和随机性生成相关的更改。
 
-### 1. 权益舍入
+### 1. 权益简化
 
 Aptos 对链上随机性的处理是通过调整每个验证者资产的算力 **权重**，以求在实际操作中提高性能，但这种调整对于保密性和系统的稳定运行（可用性）有一定的影响。具体而言，任何调整权重的规则都可能造成**精度损失**：比如，有些参与者可能会得到比应有的更多的秘密数据片段，而有些则得到更少。这样一来，原本的阈值秘密共享方式就变成了一个所谓的 **斜坡秘密共享方式**，这意味着保密和重构的阈值发生了变化。通常情况下，重构的阈值会更高。因此，为了确保网络的顺畅运行，这项机制必须保证掌握超过 66% 权益的任何一方都能进行数据重组，同时对于掌握小于或等于33%权益的一方，保证其不能解密秘密信息。为了最大限度减少 MEV（矿工提取价值）攻击的影响，我们决定提高保密的阈值，将其设为 50% ，同时保持数据能在掌握权益低于 66% 的情况下重组，从而对抗持有 33% 权益的不利因素。
 
@@ -191,8 +201,12 @@ pub struct BlockMetadataWithRandomness {
 ```
 
 交易API考虑
+
 虽然可行，但添加相应的外部交易类型可能会破坏下游生态系统，并且也不能带来多的好处。
+
 为了解决这个问题，可以通过将 `BlockMetadataWithRandomness ` 变体导出为现有的 `BlockMetadata` 变体，并忽略 `randomness` 字段。
+
+
 
 #### 2.2 新的验证者交易变体：`DKGResult`
 
@@ -214,6 +228,8 @@ pub struct DKGTranscriptMetadata {
     pub author: AccountAddress,
 }
 ```
+
+
 
 ### 3. 重新配置相关的更改
 
@@ -243,6 +259,8 @@ aptos_governance::reconfigure(&framework_signer);
 
 - 更新的 `ConsensusConfig` [在这里](https://github.com/aptos-labs/aptos-core/blob/be0ef975cee078cd7215b3aea346b2dhttps://github.com/aptos-labs/aptos-core/blob/f1d583760848c118afe88dda329105d67eea35a2/aptos-move/framework/aptos-framework/sources/configs/consensus_config.move#L52-L69)。
 
+
+
 #### 3.2 重新配置期间的验证者集锁定
 
 尽管大多数链上配置可以在 DKG 过程中继续更新其缓冲区数据，但验证者集合变化的缓冲区在重配置过程中则必须锁定。 如果不这么做，验证者的投票权分配和 VUF 权重分配可能会出现不一致，导致随机性的安全性受到威胁。
@@ -257,6 +275,8 @@ aptos_governance::reconfigure(&framework_signer);
 
 - 在链上指示器 [在这里](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-framework/sources/reconfiguration_state.move)。
 - 更新的公共框架函数 `stake::leave_validator_set()` [在这里](https://github.com/aptos-labs/aptos-core/blob/59586fee4ebb88d659f0f74afa094d728cf32b5d/aptos-move/framework/aptos-framework/sources/stake.move#L1109)。
+
+
 
 #### 3.3 新的重新配置模式：异步重新配置
 
@@ -385,7 +405,7 @@ Move VM 需要能够执行新的交易变体 `BlockMetadataExt` 和 `ValidatorTr
 
 应从 VM 端防止一些已知的针对随机性事务的攻击。
 
-#### 6.1 测试并中止
+#### 6.1 测试中止攻击
 在[test-and-abort攻击](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md#test-and-abort-attacks)中，
 一个 dApp 为用户定义了一个公共函数，用于：
 
@@ -407,10 +427,6 @@ Move VM 需要能够执行新的交易变体 `BlockMetadataExt` 和 `ValidatorTr
 2. 如果硬币 $=$​ 1，则获得奖励（ Gas 费：10），否则获得多个惩罚（ Gas 费：100）。
     恶意用户可以控制其账户余额，使其最多覆盖 788 个 Gas 单位（或以`max_gas=108`运行交易），然后调用此函数，
     因此它永远不会收到惩罚，因为发布路径会中止。
-
-  > [!TIP]
-  >
-  > 不清楚为什么是 788 而不是 108
 
 以下是防止此攻击所做的工作。
 - 假设0：一个消耗随机性的事务在任何执行路径中不会使用超过 `X` 个燃气单位。

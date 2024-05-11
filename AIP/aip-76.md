@@ -1,14 +1,21 @@
 ---
 aip: 76
 title: 数字资产可组合性
-author: aladeenb，jczhang
-discussions-to:  https://github.com/aptos-foundation/AIPs/pull/278#issue
-Status: 草案
-last-call-end-date:
-type: 标准（框架）
-created: 12/01/2023
-updated: 31/01/2024
-requires: "AIP-10: Move对象"，"AIP-11:  token 对象"，"AIP-21: 通用资产"，"AIP-43: 平行数字资产（ token V2）铸造/销毁"，"AIP-44: 模块事件"
+author: 
+  - name: aladeenb
+  - name: jczhang
+discussions-to: https://github.com/aptos-foundation/AIPs/pull/278#issue
+status: 草稿
+last-call-end-date: 
+type: 标准 (框架)
+created: 2023-12-01
+updated: 2024-01-31
+requires: 
+  - AIP-10: 移动对象
+  - AIP-11: 代币对象
+  - AIP-21: 可互换资产
+  - AIP-43: 并行化数字资产（代币 V2）铸造/销毁
+  - AIP-44: 模块事件
 ---
 
 [TOC]

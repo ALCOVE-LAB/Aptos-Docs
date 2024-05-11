@@ -1,11 +1,15 @@
 ---
 aip: 74
-title: 为了应对并发性的增加，需要增加区块的 Gas 限制
-author: Sital Kedia（skedia@aptoslabs.com），Igor Kabiljo（ikabiljo@aptoslabs.com）
-discussions-to（*可选）：https://github.com/aptos-foundation/AIPs/issues/375
-Status: 已接受
-type: <Standard>
-created: <03/12/2024>
+title: 增加区块燃气限制以适应并发增加
+author: 
+  - name: Sital Kedia
+    email: skedia@aptoslabs.com
+  - name: Igor Kabiljo
+    email: ikabiljo@aptoslabs.com
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/375
+status: 已接受
+type: 标准
+created: 2024-03-12
 ---
 
 [TOC]
