@@ -15,7 +15,7 @@ requires (*optional): <AIP number(s)>
 
 
 
-# AIP-41 - 用于生成随机数的 Move API
+# AIP-41 - 用于公共随机数生成的 Move API
 
 **版本:** 1.3
 

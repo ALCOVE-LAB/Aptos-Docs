@@ -1,19 +1,18 @@
 ---
 aip: 61
-title: Keyless accounts
+title: 无秘钥账户
 author: Alin Tomescu (alin@aptoslabs.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/297
-Status: Approved
-last-call-end-date (*optional): 02/15/2024
-type: <Standard (Core, Framework)>
-created: 01/04/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/297
+Status: 已接受
+last-call-end-date: 2024/02/15
+type: Standard (Core, Framework)
+created: 2024/01/04
+requires: <AIP number(s)>
 ---
 
 [TOC]
 
-# AIP-61 - Keyless accounts（无秘钥账户）
+# AIP-61 - 无秘钥账户
 
 ## 一、摘要
 
@@ -21,13 +20,22 @@ requires (*optional): <AIP number(s)>
 
 目前，唯一确保 Aptos 账户安全的方法是妥善保管与之相连的**秘密密钥（SK）**[^multisig]。然而，这个任务远远不如听起来那么简单。实际情况是，用户很容易遗失秘密密钥（比如，在第一次设置 Aptos 钱包时忘记记录助记词）或者密钥被盗用（例如，被骗子诱导泄露了自己的 SK）。这样一来，让用户开始使用的过程变得异常困难，并且当他们的账户丢失或被盗时，还会导致用户流失。
 
-在本 AIP 中，我们阐述了一种对用户更加友好的账户管理途径，该方法基于未经修改的[^openpubkey] **OpenID Connect （OIDC）** 标准，并结合了关于 **OIDC 签名**的 **零知识证明（ZKPoKs）** 的最新进展[^snark-jwt-verify]$^,$[^nozee]$^,$[^bonsay-pay]$^,$[^zk-blind]$^,$[^zklogin]。
+在这份 AIP 中，我们描述了一种更用户友好的账户管理方法，该方法依赖于：
+
+1. **未修改的**[^openpubkey] **开放身份认证连接（OIDC）**标准，
+2. 其区块链应用[^openzeppelin],[^eip-7522],[^zkaa]，
+3. **零知识证明知识（ZKPoKs）**在**OIDC签名**[^snark-jwt-verify]，[^nozee]，[^bonsay-pay],[^zk-blind]，[^zklogin]的最新进展。
 
 更具体地说，在 Aptos 上，我们提供了不需要传统密钥的**无密钥账户**，这些账户通过用户已有的**OIDC账户**（即他们在 Google、GitHub 或 Apple 等**OIDC提供商**拥有的 Web2 账户）来确保安全，而不是通过难以管理的密钥。总的来说，就是 **”你的区块链账户 = 你的 OIDC 账户**“。
 
+> [!WARNING]
+> 无密钥账户的一个重要特性是，它们不仅与用户的 OIDC 账户**绑定**（例如， `alice@gmail.com` ），同时也与一个在 OIDC 提供商注册的**管理应用程序**绑定（例如， dapp 的`dapp.xyz`网站，或者手机的钱包应用）。换句话说，它们是**特定应用程序**的账户。因此，如果一个账户的管理应用程序消失或者丢失了其 OIDC 提供商的注册凭证，那么与这个应用程序绑定的用户账户将会无法访问，除非提供了可供替代的**恢复路径**（下面将进行讨论）。
 
 
-无密钥账户的一个重要特性是，它们不仅与用户的 OIDC 账户**绑定**（例如， `alice@gmail.com` ），同时也与一个在 OIDC 提供商注册的**管理应用程序**绑定（例如， dapp 的`dapp.xyz`网站，或者手机的钱包应用）。换句话说，它们是**特定应用程序**的账户。因此，如果一个账户的管理应用程序消失或者丢失了其 OIDC 提供商的注册凭证，那么与这个应用程序绑定的用户账户将会无法访问，除非提供了可供替代的**恢复路径**（下面将进行讨论）。
+
+
+
+
 
 ### 1. 目标
 
@@ -95,6 +103,8 @@ requires (*optional): <AIP number(s)>
 - **证明密钥** 和 **验证密钥**
 - **特定关系的可信设置**
 
+我们假设一个对 SNARK 友好的哈希函数 $H_\mathsf{zk}$ ，它在我们的零知识证明 (ZKP) 内部易于证明。
+
 #### 2.5 Aptos 账户和交易验证
 
 回忆一下，在 Aptos 中，一个账户由其 **address** 标识，账户的**认证密钥**存储在该地址下。
@@ -126,13 +136,15 @@ requires (*optional): <AIP number(s)>
 1. DNS 和 X.509 证书生态系统的安全性
    - 无密钥账户依赖于 OAuth 和 OIDC ，其安全性反过来依赖于 DNS 和 X.509 证书生态系统的安全性。
    - 鉴于所有互联网软件均未脱离上述体系，故此部分不在本范围内。
+
 2. 冒充真正钱包应用的恶意钱包应用
    - 我们假设攻击者**无法**在（比如说）苹果的 App Store 中发布一个冒充钱包注册的 OAuth `client_id` 的手机应用
    - 我们假设攻击者**无法**欺骗用户安装一个冒充另一个应用的 OAuth `client_id` 的恶意桌面应用。因此，我们**不**推荐对桌面应用的无密钥账户进行管理，因为它们非常容易被冒充。
+
 3. 对无密钥账户所需的辅助后端组件的深入讨论：
-   - **Pepper 服务**：将是未来AIP的范围（参见[附录](#3. Pepper 服务)）
-   - **ZK 证明服务**：将是未来AIP的范围（参见[附录](#4. (预料之外的) 零知识证明服务)）
-   - **对 JSON Web Keys (JWKs)的共识**：将是未来AIP的范围（参见[附录](#5. JWK 共识)）
+   - **Pepper 服务**：这是 AIP-81[^aip-81] 讨论的主题，相关内容的概述可以在[附录](#Pepper服务)找到。
+   - **ZK 证明服务**：这是 AIP-75[^aip-75] 讨论的主题，相关内容的概述可以在[附录](#（预料之外的）零知识证明服务）找到。
+   - **JSON Web 密钥 (JWKs) 的共识协议**：这是 AIP-67[^aip-67] 讨论的主题，相关内容的概述可以在[附录](#5JWK共识)找到。
    - 对我们的 Groth16 ZKP 的**可信设置 MPC 仪式**（参见[Groth16讨论](#1. 选择 ZKP 系统：Groth16)）
 4. Pepper 和 ZK 证明服务的去中心化计划
 
@@ -164,10 +176,9 @@ requires (*optional): <AIP number(s)>
    
 3. 用户
    - 熟悉无密钥账户的安全模型
-   - 理解他们的账户将和他们的 OpenID 账户（例如，他们的 Google 账户）一样安全
-   - 了解如果管理应用程序无法使用时，如何采用备选的 **恢复方式** 进行操作。
-   
-   
+   - 认识到他们的账户的很安全，就像他们的 OpenID 账户（比如 Google 账户）一样。
+   - 如果管理应用无法使用了，知道如何[恢复账户](#恢复服务)。
+
 
 ## 四、替代方案
 
@@ -177,15 +188,18 @@ requires (*optional): <AIP number(s)>
 
 一个避免用户需要管理自己密钥的替代方案是 **Passkeys** 和围绕它们构建的 **WebAuthn 标准**。Passkey是与应用程序或网站关联的密钥，它在用户的云中备份（例如， Apple 的 iCloud ，Google 的密码管理器等）。
 
-Passkey 密钥最初是作为替代密码的一种方式引入网站的，方法是网站将每个用户的密码替换为他们的 Passkey 公钥。然后，用户可以使用他们对应的 Passkey 私钥进行安全认证，方法是对一个随机的质疑（a random challenge）进行签名，从而向网站验证他们的身份，同时这个私钥被安全地存储在他们的云储存中。
+Passkeys 最初被设计为取代传统的网站密码，它的工作原理是：网站不再保存用户的密码，而是保存与用户唯一对应的 passkey 公钥。当用户需要登录网站时，只需用自己的 passkey 私钥对网站提供的一个随机验证信息进行签名，就能安全地证明其身份，而用户的 passkey 私钥则安全地存储在云端备份中。
 
 人们的自然倾向是利用 Passkey 密钥来操作区块链账户，方法是把账户的私钥设置成 Passkey 密钥。不幸的是，Passkey 密钥目前存在两个问题，但这些问题很可能在未来得到解决。具体来说，**在一些平台（例如 Microsoft Windows）上，Passkey 密钥并不总是会自动备份到云储存**。此外，Passkey 密钥还带来了一个**跨设备的问题**：比如，用户在他们的苹果手机上创建了一个区块链账户，他们的 Passkey 密钥会被备份至 iCloud，但是这个备份在那位用户的其他安卓、Linux 或 Windows 设备上却无法获取，因为目前还未实现能跨多个平台备份 Passkey 密钥的功能。
 
 
+将来，一种增强 passkeys 应用的可考虑的方法是通过 passkey 对用户的助记词进行加密，这样就能提供一个额外的备份选项。然而，目前还不明确，WebAuthn PRF 扩展[^webauthn-prf]在业界的支持情况如何。
 
 ### 2. 多方计算 (MPC)
 
 一个避免用户需要管理自己秘密密钥的替代方案是依赖于**多方计算 (MPC)** 服务来为已经被**某种方式**认证的用户计算签名。
+
+通常情况下，用户在不需要自己管理密钥（SK）的情况下，应该以便于使用的方式向多方计算（MPC）系统进行认证。如果不这样做，MPC 系统就无法解决用户体验上的问题，因而会变得毫无用处。因此，大部分 MPC 系统在需要代表用户完成签名之前，都会通过 OIDC 或者 Passkeys 来进行对用户的认证。
 
 通常情况下，用户必须以用户友好的方式向 MPC 进行认证（即，无需管理私钥 ）。除此之外， MPC 系统不会解决任何用户体验问题，因为那毫无用处。结果是，大多数 MPC 系统在代表用户签名前要么使用 OIDC 要么使用通行密钥来认证用户。
 
@@ -193,19 +207,27 @@ Passkey 密钥最初是作为替代密码的一种方式引入网站的，方法
 
 其次，由于用户可以直接通过 OIDC 向验证器进行认证（正如本 AIP 所论述的），或通过通行密钥（如[上文](#1. Passkeys)所述），因此 MPC 在本质上是多余的。
 
-换种方式来说，**无密钥账户免去了对复杂的多方计算 (MPC) 签名服务的需求**（而这种服务可能在安全性和稳健性方面难以实现），因为它通过开放身份认证 (OIDC) 直接进行用户认证。同时，无密钥账户在安全性上与基于 MPC 的账户不相上下，因为它们都采用 OIDC 作为启动安全防护的基础。
+换句话说，**无密钥账户（keyless accounts）避免了对复杂的多方计算（MPC）签名服务的需求**（安全且稳定地搭建此类服务可能颇具挑战），它们通过 OIDC 直接完成对用户的认证。
 
-
+事实上，免密账户的安全性**更高**，因为一旦 MPC 系统发生安全漏洞，账户就有被盗的风险。而免密账户除非面临这样的情况：（1）用户的 OIDC 账户出现安全问题，或（2）OIDC 服务提供商本身遭受攻击，否则是**不会**被盗的！
 
 尽管如此，无密钥账户仍然依赖于一个分布式的 pepper 服务和一个 ZK 证明服务（见[附录](#十三、附录)）。然而：
 
 - 仅仅在进行零知识证明 (ZKP) 计算时，为了提升浏览器或手机上的性能，才需要使用证明服务。随着 ZKP 系统未来的优化，这种服务预计将不再需要。
 - Pepper 服务，与MPC服务不同，对于安全性不敏感：即使攻击者完全占据了 Pepper 服务，也无法偷走用户账户；除非他们也破坏了用户的 OIDC 账户。
-- 尽管 Pepper 服务在确保系统活跃的方面非常关键，意味着没有 Pepper 服务，用户无法进行任何操作，我们通过采用一个基于简单的可验证随机函数 (VRF) 的设计来实现去中心化，从而解决了这个问题。
+- 虽然 pepper 服务对于系统的即时响应性有较高要求，也就是说，用户在没法使用自己的 pepper 的情况下无法完成交易，但我们可以通过采用基于 VRF 的简易设计方案将其分散化，从而解决这个问题。
+- MPC 系统的一个**优点**在于，MPC 节点可以在执行交易（TXN）签名前进行**诈骗检测**（fraud detection）。至于进行诈骗检测是在 MPC 系统中好些，还是在钱包中或通过账户抽象好些，这一点需要更深入的研究。
+
 
 ### 3. HSMs 或可信硬件
 
 从根本上讲，这种方法遭受的问题与 MPC 方法相同：它必须使用基于 OIDC 或基于 Passkey 的对用户友好的方法，来认证用户到一个可以代表他们签名的外部（基于硬件的）系统。
+
+因此，该外部系统（即硬件安全模块，HSM）可能成为一个不必要的风险点 —— 一个可能被攻破的风险点。
+
+正如前文所述，我们的策略可以直接让用户向区块链验证者认证，避免了引入额外的基础架构，而带来风险。
+
+硬件安全模块（HSM）或者其他可信硬件的一个优势在于它们相对较简单的实现过程。更重要的是，不同于多方计算（MPC）的方法，使用可信硬件可能更容易确保隐私安全。
 
 如上所述，我们的方法直接将用户认证到区块链验证器，无需额外的基础设施，同时不会损失任何安全性。
 
@@ -215,22 +237,20 @@ Passkey 密钥最初是作为替代密码的一种方式引入网站的，方法
 
  > 我们将如何解决这个问题？详细描述应如何实施这个提案。包括在实施这个特性时应遵循的设计原则。使提案具体到足以让其他人可以在其基础上进行构建，甚至可能派生出竞争的实现。
 
-### 1. 无密钥账户
-
 以下，我们解释了实现无密钥账户背后的关键概念：
 
 1. 无密钥账户的 **公钥** 是什么？
 2. 如何从这个公钥派生出 **认证密钥** ？
 3. OIDC 账户交易的 **数字签名** 是什么样的？
 
-#### 1.1 公钥
+### 1. 公钥
 
 无密钥账户的 **公钥** 包括：
 
 1. $\mathsf{iss\\_val}$：OIDC 提供者的身份，即在 JWT 的 `iss` 字段中显示的内容（比如，`https://accounts.google.com`），我们将其标记为 $\mathsf{iss\\_val}$
 2. $\mathsf{addr\\_idc}$：一个**身份承诺（IDC）**，这是一个<u>隐藏</u>承诺，承诺包括：
    - OIDC 提供商发给拥有用户的标识符（例如， `alice@gmail.com` ），由 $\mathsf{uid\\_val}$ 表示。
-   - 存储用户标识符的 JWT 字段的名称，由 $\mathsf{uid\\_key}$ 表示。目前，我们只允许 `sub` 或 `email` [^jwt-email-field]。
+   - 用于存放用户标识（标记为 $\mathsf{uid\\_key}$）的 JWT 字段称为。目前，Typescript SDK 为了避免初学者选择错误的 JWT 字段，仅支持 `sub` 或 `email`[^jwt-email-field] 字段。然而，验证系统将接受任意字段，这样做是为了不限制那些希望在此基础上进行创新的资深用户。
    - 在与 OIDC 提供商注册期间发给管理应用程序的标识符（即，存储在 JWT 的 `aud` 字段中的 OAuth  `client_id` ），由 $\mathsf{aud\\_val}$ 表示。
 
 稍微正式一点（但忽略复杂的实现细节），IDC 是通过使用一个对 SNARK 友好的哈希函数 $H'$ 对上述字段进行哈希计算得到的：
@@ -239,14 +259,14 @@ $$
 \mathsf{addr\_idc} = H'(\mathsf{uid\_key}, \mathsf{uid\_val}, \mathsf{aud\_val}; r),\ \text{where}\ r\stackrel{\$}{\gets} \{0,1\}^{256}
 $$
 
-#### 1.2 Peppers
+### 2 Peppers
 
-请注意，在上述 IDC 的推导中，我们使用了一个具有高熵性质的盲因子 $r$。这保证了 IDC 真正成为一个对用户及其关联应用程序身份信息的隐藏式承诺（hiding commitment）。在整个 AIP 文档中，这一盲因子 $r$ 被称作保护隐私的 **pepper**。
+在上述内容中，我们采用了一个具有高熵的掩码因子（blinding factor） $r$ 来生成 IDC。这确保 IDC 真实隐藏了用户和管理应用程序的身份信息。在这份 AIP 报告中，这种掩码因子即被称作保障隐私的**pepper**。
 
 Pepper 有两个重要的属性：
 
 1. 在签署交易以授权访问账户时，将需要知道 pepper $r$。
-2. 如果 pepper 被公开，这**不会**允许攻击者获取与该公钥相关联的账户的访问权限。换言之，不同于密钥，pepper 不需要保密以保护账户的安全性；它只需保护账户的隐私性。
+2. 即便 pepper 公开了，这也**不会**使得攻击者能够获取账户的访问权限。换言之，不同于密钥，pepper 无需通过加密来确保账户的安全性；它只关乎账户隐私的保护。
 
 更简单地说：
 
@@ -255,9 +275,10 @@ Pepper 有两个重要的属性：
 
 依赖于用户记住他们的 pepper $r$，这将维持易于丢失的基于密钥的账户的现状，从而 **打破了** 基于OpenID的区块链账户的目标*。
 
-因此，我们引入了一个 **pepper 服务**，可以帮助用户恢复他们的 pepper（我们在[附录](#3. Pepper 服务)中讨论了它的属性）。
+因此，我们引入了一种 **pepper service**，旨在帮助用户生成并记忆他们的 pepper（有关这项服务的特点，我们在[附录](#Pepper服务)中有简要介绍，并在 AIP-81[^aip-81] 文档中进行了深入探讨）。
 
-#### 1.3 认证密钥
+
+### 3 认证密钥
 
 接下来，无密钥账户的**认证密钥**就是其上述公钥的哈希。更正式地说，假设任何加密哈希函数 $H$ ，认证密钥为：
 
@@ -267,7 +288,7 @@ $$
 
 **注意**：在实践中，上述的哈希还包括一个域分隔符，但为了简化阐述，我们忽略了这些细节。
 
-#### 1.4 私钥
+### 4 私钥
 
 在定义了上述的“公钥”之后，一个自然的问题出现了：
 
@@ -275,18 +296,24 @@ $$
 
 答案是，用户没有额外的密钥需要记忆。相反，这个“私钥”，由用户通过上述的 $\mathsf{auth\\_key}$ 中承诺的管理应用程序登录到OIDC账户的能力构成。
 
-换句话说，这个“私钥”可以被认为是用户对那个账户的密码，用户已经知道了，或者一个预安装的 HTTP cookie ，这可以避免用户需要重新输入密码。尽管如此，这个**密码是不够的**：管理应用程序必须是可用的：它必须允许用户登录到他们的OIDC账户并接收OIDC签名。（我们稍后讨论[如何处理消失的应用程序](#2. 管理应用程序消失的备用恢复机制)。）
+换句话说，"秘钥" 其实就是用户用来登录账户的密码，用户本人已经知道这个密码，或者它可以是一个预先安装的 HTTP cookie，从而省去了用户重复输入密码的步骤。然而，单单有这个**密码是不够的**：管理应用程序必须处于可用状态，它得允许用户登录他们的 OIDC 账户并获取 OIDC 签名。（关于如何应对应用程序不可用的问题，我们将在后文详细介绍[当管理应用不可用时的替代恢复路径](#当管理应用不可用时的替代恢复路径)。）
 
 更正式地说，如果一个用户可以成功地使用由 $\mathsf{aud\\_val}$ 标识的应用程序登录（通过 OAuth ）到由 $(\mathsf{uid\\_key}, \mathsf{uid\\_val})$ 标识并由 $\mathsf{iss\\_val}$ 标识的 OIDC 提供商发出的 OIDC 账户，那么这个能力就作为那个用户的“私钥”。
 
-#### 1.5 热身：泄露用户和应用身份的签名
+### 5. 签名
+
+我们先从“热身”开始，讲述我们所开发的“泄露模式”（leaky mode）无密钥签名方案，该方案并不保障用户隐私。紧接着，我们将介绍“零知识”（zero-knowledge）签名方案，该方案能够有效保护用户隐私。
+
+
+
+### 6. 热身：泄露用户和应用身份的签名
 
 在描述我们完全保护隐私的 TXN 签名之前，我们先热身一下，描述一下**泄露签名**，它们会泄露用户和应用的身份：即，它们会泄露 $\mathsf{uid\\_key}, \mathsf{uid\\_val}$ 和 $\mathsf{aud\\_val}$ 。
 
 一个地址的交易 $\mathsf{txn}$ 的**泄露签名** $\sigma_\mathsf{txn}$，该地址的认证密钥为$\mathsf{auth\\_key}$，定义如下：
 
 $$
-\sigma_\mathsf{txn} = (\mathsf{uid\_key}, \mathsf{jwt}, \mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \sigma_\mathsf{oidc}, \mathsf{exp\_date}, \rho, r)
+\sigma_\mathsf{txn} = (\mathsf{uid\_key}, \mathsf{jwt}, \mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \sigma_\mathsf{oidc}, \mathsf{exp\_date}, \rho, r, \mathsf{idc\_aud\_val})
 $$
 
 其中:
@@ -298,43 +325,52 @@ $$
 5. $\sigma_\mathsf{eph}$ 是对交易$\mathsf{txn}$的临时签名
 6. $\sigma_\mathsf{oidc}$ 是对完整 JWT（即，对$\mathsf{header}$和$\mathsf{jwt}$有效载荷）的 OIDC 签名
 7. $\mathsf{exp\_date}$ 是一个时间戳，过了这个时间，$\mathsf{epk}$就被认为过期，不能用来签名TXN。
-8. $\rho$是一个高熵的 EPK 盲因子，用于创建对 $\mathsf{epk}$ 和 $\mathsf{exp\_date}$ 的 EPK 承诺，该承诺存储在 $\mathsf{jwt}[\texttt{"nonce"}]$ 字段中
-9. $r$ 是地址 IDC 的 pepper，假定在这种"泄露模式"下为零
+8. $\rho$ 是一个关键的高熵度变量，用于生成与 $\mathsf{epk}$ 和 $\mathsf{exp\\_date}$ 相关的 **EPK 承诺**。这个承诺被存储在 $\mathsf{jwt}[\texttt{"nonce"}]$ 字段中，为了保证数据的安全性。
 
-**简而言之**：为了**验证交易签名 $\sigma_\mathsf{txn}$**，验证者需要检查OIDC提供者是否（1）对用户和应用ID在地址IDC中的承诺进行了签名，以及（2）对EPK进行了签名，此EPK又对交易进行了签名，并且对EPK执行了一些过期策略。
+ 9. $r$ 作为一个特殊码，用于地址IDC，但在所谓的“泄露模式”中，这个值通常被设置为零。
+
+10. $\mathsf{idc\\_aud\\_val}$ 是一个选填字段，主要用于账户的[恢复操作](#recovery-service)。如果被设置，它将包含一个与 IDC 中相同的 `aud` 值。这是在恢复时需要包含在TXN 签名中的重要信息，因为在那种情况下，$\mathsf{jwt}$ 的负载将会包含恢复服务的 `aud` 值，而非原本在 IDC 中承诺的 `aud` 值。
+
+> [!TIP]
+> **概括来说**：为了**核实 $\sigma_\mathsf{txn}$ 签名**，验证者需要确认：首先，OIDC 提供者是否（1）签署了地址IDC（或恢复服务的ID）中记录的用户与应用ID；其次，是否（2）对 EPK 进行了签名，而 EPK 又签署了这笔交易，同时还要确保 EPK 的有效期得到了严格限制。
 
 更详细地说，针对公钥 $(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$ 的签名验证包括以下步骤：
 
 1. 如果使用基于 `email` 的ID，确保已验证电子邮件：
-   1. 如果 $\mathsf{uid\\_key}\stackrel{?}{=}\texttt{"email"}$，则断言  $\mathsf{jwt}[\texttt{"email\_verified"}] \stackrel{?}{=} \texttt{"true"}$
+   1. 也就是说，如果$\mathsf{uid\\_key}\stackrel{?}{=}\texttt{"email"}$，我们就验证（断言 assert） $\mathsf{jwt}[\texttt{"email\_verified"}] \stackrel{?}{=} \texttt{"true"}$。
 2. 让 $\mathsf{uid\\_val}\gets\mathsf{jwt}[\mathsf{uid\\_key}]$
-3. 让 $\mathsf{aud\\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$
-4. 断言 $\mathsf{addr\\_idc} \stackrel{?}{=} H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$，其中 $r$ 来自签名的pepper
-5. 验证PK是否与链上的认证密钥匹配：
-   1. 断言 $\mathsf{auth\\_key} \stackrel{?}{=} H(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$
-6. 检查EPK是否在JWT的`nonce`字段中提交：
-   1. 断言 $\mathsf{jwt}[\texttt{"nonce"}] \stackrel{?}{=} H’(\mathsf{epk},\mathsf{exp\\_date};\rho)$
-7. 检查EPK的过期日期是否过于遥远（我们在下面详细说明）：
-   1. 断言 $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{max\\_exp\\_horizon}$，其中 $\mathsf{max\\_exp\\_horizon}$ 是一个链上参数
-   2. 我们不断言过期日期不在过去（即，断言 $\mathsf{exp\\_date} > \mathsf{jwt}[\texttt{"iat"}]$）。相反，我们假设JWT的发行时间戳（`iat`）字段是正确的，因此接近当前的区块时间。所以，如果应用程序错误地设置了 $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}]$，那么EPK将过期且无用。
-8. 检查EPK是否过期：
-   1. 断言 $\texttt{current\_block\_time()} < \mathsf{exp\_date}$
-9. 验证交易 $\mathsf{txn}$ 下的 $\mathsf{epk}$ 的临时签名 $\sigma_\mathsf{eph}$
-10. 获取 OIDC 提供者的正确 PK ，由 $\mathsf{jwk}$ 表示，通过JWT $\mathsf{header}$ 中的 `kid` 字段识别。
-11. 验证 JWT $\mathsf{header}$ 和有效载荷 $\mathsf{jwt}$ 下的  $\mathsf{jwk}$ 的OIDC签名 $\sigma_\mathsf{oidc}$ 。
+3. 当设置了 $\mathsf{idc\\_aud\\_val}$ 时，我们需要确认 $\mathsf{jwt}[\texttt{"aud"}]$ 是一个被批准的恢复服务 ID，这个ID应在链上的 [`aud` 覆写列表](#aud-override-list)里面。
+4. 当设置了 $\mathsf{idc\\_aud\\_val}$，我们就让 $\mathsf{aud\\_val}\gets \mathsf{idc\\_aud\\_val}$；如果没设置，那么就让 $\mathsf{aud\\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$。
+5. 验证（断言 assert） $\mathsf{addr\\_idc} \stackrel{?}{=} H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$，其中 $r$ 来自签名的 pepper
+6. 验证PK是否与链上的认证密钥匹配：
+   - 验证  $\mathsf{auth\\_key} \stackrel{?}{=} H(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$
+7. 检查 EPK 是否在 JWT 的`nonce`字段中提交：
+   - 验证  $\mathsf{jwt}[\texttt{"nonce"}] \stackrel{?}{=} H’(\mathsf{epk},\mathsf{exp\\_date};\rho)$
+8. 检查 EPK 的过期日期是否过于遥远（我们在下面详细说明）：
+   - 确保 $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{max\\_exp\\_horizon}$ ，其中 $\mathsf{max\\_exp\\_horizon}$  是在链上的参数（详情参见[此处](#move-module)）。  
+   - 我们不要求过期时间必须设置在未来的某个时间，也就是说，不检查 $\mathsf{exp\\_date} > \mathsf{jwt}[\texttt{"iat"}]$ 。相反，我们假设 JWT 的签发时间戳（`iat`）字段是正确的，，并且与当前区块时间相近。因此，如果应用程序错误地设置为 $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}]$ ，那么从区块链的视角看，EPK 会被认为已过期。
+9. 检查EPK是否过期：
+   - 断言 $\texttt{current\_block\_time()} < \mathsf{exp\_date}$
+10. 验证交易 $\mathsf{txn}$ 下的 $\mathsf{epk}$ 的临时签名 $\sigma_\mathsf{eph}$
+11. 获取 OIDC 提供者的正确 PK ，由 $\mathsf{jwk}$ 表示，通过JWT $\mathsf{header}$ 中的 `kid` 字段识别。
+12. 验证 JWT $\mathsf{header}$ 和有效载荷 $\mathsf{jwt}$ 下的  $\mathsf{jwk}$ 的OIDC签名 $\sigma_\mathsf{oidc}$​ 。
 
-**JWK 共识**：验证 OIDC 签名的最后一步需要验证者**就 OIDC 提供商的最新 JWKs （即公钥）达成共识**，这些公钥在特定时间周期内会更新。公钥在 **OpenID 配置URL**定期进行更新（参见[附录](#5. JWK 共识)）。
+> [!NOTE]
+> **JWK共识**: 在验证 OIDC 数字签名的最后一步，要求所有验证节点**对 OIDC 提供商的最新 JSON Web Keys（公钥）达成共识**，这些公钥由提供商在特定的**OpenID 配置 URL**上发布。
+>
+> 为此，验证节点需要就提供商的公钥达成共识，并在 `aptos_framework::jwks`  Move  模块中展示这些信息（具体细节见[附录](#jwk-consensus)以及 AIP-67[^aip-67]文档）。
 
-如何在所有支持的 OIDC 提供商的 JWKs 上达成 Aptos 验证者的共识将是另一个 AIP 的讨论主题。目前，本 AIP 假设有一个机制存在，验证者能够通过`aptos_framework::jwks` Move 模块获取到当下供应商的 JWKs。
+>[!NOTE]
+>**设定到期日期的必要性：** 我们认为，对于不了解安全性的 dapps 开发者来说，设定一个过于遥远的 $\mathsf{exp\\_date}$ 会带来风险。这让攻击者有更长的时间来攻破已签名的 JWT（及其相关的 ESK）。因此，我们要求到期日期不宜设得过远 —— 在 JWT 的 `iat` 字段的基础上定义一个的 "最大到期时限" $\mathsf{max\\_exp\\_horizon}$ 来限制，也就是说，确保 $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{max\\_exp\\_horizon}$。
+>
+>另一种方法是确保 $\mathsf{exp\_date} < \texttt{current\_block\_time()} + \mathsf{max\_exp\_horizon}$。然而，这并不理想。攻击者可能会创建一个 $\mathsf{exp\\_date}$，在当前时间 $t_1 = \texttt{current\_block\_time()}$ 时无法通过检查（即，$\mathsf{exp\\_date} \ge t_1 + \mathsf{max\\_exp\\_horizon}$），但在时间变为 $t_2 > t_1$ 时能够通过检查（即，$\mathsf{exp\\_date} < t_2 + \mathsf{max\\_exp\\_horizon}$）。因此，一些起初被认为是无效（似乎也无害）的签名 JWT 后来有可能变得有效（变成了值得攻击的目标）。依赖于 JWT 的 'iat' 字段，就可以避免这种情况的发生。
 
-**设定到期日期的必要性：** 我们认为，对于不了解安全性的 dapps 来说，设定一个过于遥远的 $\mathsf{exp\\_date}$ 将带来风险。这会为攻击者提供更长的时机来攻破已签名的 JWT（及其相关的 ESK）。因此，我们要求到期日期不宜设得过远，在 `iat` JWT 字段的基础上根据一个具体的 "最大到期时限" $\mathsf{max\\_exp\\_horizon}$ 来限制：也就是说，我们确保 $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{max\\_exp\\_horizon}$。
 
-另一种方法是确保 $\mathsf{exp\_date} < \texttt{current\_block\_time()} + \mathsf{max\_exp\_horizon}$。然而，这并不理想。攻击者可能会创建一个 $\mathsf{exp\\_date}$，在当前时间 $t_1 = \texttt{current\_block\_time()}$ 时无法通过检查（即，$\mathsf{exp\\_date} \ge t_1 + \mathsf{max\\_exp\\_horizon}$），但在时间变为 $t_2 > t_1$ 时能够通过检查（即，$\mathsf{exp\\_date} < t_2 + \mathsf{max\\_exp\\_horizon}$）。因此，这种设计会允许看似无效（因此无害）的已签名JWT后来变得有效（因此值得攻击）。依赖 `iat` 可以避免这个问题。
 
 接下来将要解决是的**关于模式泄露的警告**：
 
-- Pepper $r$ 会因为交易而泄露，使得地址 IDC 暴露于暴力破解的风险之中。
-- 类似地，EPK 的盲化因子 $\rho$ 被交易透露，目前还未能实现其保护隐私的预期功能。
+- Pepper $r$​ 会因为交易而泄露，使得地址 IDC 暴露于暴力破解的风险之中。
+- 类似地，EPK 的盲化因子 $\rho$ 被 TXN 透露了，因此，目前还未能实现其保护隐私的目的。
 - JWT 有效载荷以明文存在，泄漏了管理应用和用户的身份信息。
 - 即便 JWT 有效载荷被隐藏，OIDC 签名同样可能会泄露这些身份信息，因为已签名的 JWT 可能具有低熵。由此，攻击者可以对一组可能被签名的 JWT 进行针对性的暴力破解，以验证签名。
 
@@ -345,74 +381,101 @@ $$
 特定的交易 $\mathsf{txn}$ ，该交易针对拥有认证密钥 $\mathsf{auth\\_key}$ 的地址，其**零知识签名** $\sigma_\mathsf{txn}$  定义如下所示：
 
 $$
-\sigma_\mathsf{txn} = (\mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \mathsf{exp\_date}, \mathsf{exp\_horizon}, \pi)
+\sigma_\mathsf{txn} = (\mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \mathsf{exp\_date}, \mathsf{exp\_horizon}, \mathsf{extra\_field}, \mathsf{override\_aud\_val}, \sigma_\mathsf{tw}, \pi)
 $$
 
 其中：
 
-1. $(\mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \mathsf{exp\\_date})$ 如之前的描述。
-2. $\mathsf{exp\\_horizon}$ 是一个小于等于 $\mathsf{max\\_exp\\_horizon}$ 的值；$\mathsf{exp\\_date}$ 需要位于 $\mathsf{jwt}[\texttt{"iat"}]$ 和 $\mathsf{jwt}[\texttt{"iat"}] + \mathsf{exp\\_horizon}$ 之间。
-3. $\pi$ 是一个对于 ZK 关系 $\mathcal{R}$（将在下面定义）的**零知识证明**（ZKPoK）。
+1. $(\mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \mathsf{exp\\_date})$ 如[之前](#warm-up-leaky-signatures-that-reveal-the-users-and-apps-identity)所述，此外还有以下变化： 
+   - 临时签名 $\sigma_\mathsf{eph}$ 现在还额外包含了零知识证明 (Zero-Knowledge Proof) $\pi$​，以此来抵御更改攻击（malleability attacks）。
 
-请注意，签名中不再包括除了 $\mathsf{iss\\_val}$ 中的 OIDC 提供商身份外的任何能识别用户的信息。
+2. $\mathsf{extra\_field}$ 是一个**可选**字段 (optional field)，它需要在 JSON Web Token（JWT）中匹配，并且会被**公开地** (publicly) 展示（例如，用户如果想公开他们的电子邮箱地址，就将 `extra_field` 设置为 `"email": "alice@gmail.com"`）。
+3. $\mathsf{override\\_aud\\_val}$ 是[账户恢复](#recovery-service)服务中使用的一个**可选**字段 (optional field)。当该字段包含了一个替代 `aud` 值（这是恢复服务的 `client_id`），这通常会被 JWT 载荷的 ZKP 遮蔽掉。在设置此字段的情况下，ZKP 关系（接下来将描述）会核对这个重写的 `aud` 值是否与 JWT 中的 `aud` 相符，而不是与身份验证服务（IDC）的 `aud` 相比较，这与之前提到的泄露模式（leaky mode）类似。 
+4. $\sigma_\mathsf{tw}$ 是针对[training wheels 模式](#training-wheels)下零知识证明（ZKP）的一个**可选的** **training wheels 签名**。
+5. $\pi$ 是针对零知识（ZK）关系 $\mathcal{R}$​ 的一个**零知识证明 (ZKPoK)**，用于执行针对隐私保护的验证（这部分内容将在随后详细讨论）。
 
-**总结**：为了**验证 $\sigma_\mathsf{txn}$ 这个签名**，验证者需要核实 OIDC 签名的 ZKPoK，其中包括了：(1) 在认证密钥中记录的用户和应用的 ID；以及 (2) 对交易进行签名的 EPK，其还强制了 EPK 上的一些过期约束。
+>[!NOTE]
+> 请注意，$\sigma_\mathsf{txn}$ 交易的签名现在不再含有用户的任何可识别个人信息（除了 $\mathsf{iss\\_val}$ 中 OIDC 提供方身份的信息）。
 
-更为具体地，针对公钥 $\mathsf{iss\\_val}, \mathsf{addr\\_idc}$ 执行签名验证包括以下几个步骤：
+>[!TIP]
+>**简而言之**：为了**验证 $\sigma_\mathsf{txn}$ 签名**，验证者需要核实一个对 OIDC 签名的零知识证明 (ZKPoK)。此 OIDC 签名包括：（1）用户和应用程序 ID —— 在地址 IDC 中或者在恢复服务的 ID 中进行了承诺；（2）EPK 进而对交易进行签名，并为 EPK 设定了过期时间。
 
-1. 断定 $\mathsf{auth\\_key}$ 是否等于 $H(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$，这个过程如之前所述。
+更进一步，针对公钥 $(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$ 的签名验证包含了以下几个步骤:
+
+1. 验证 $\mathsf{auth\\_key} \stackrel{?}{=} H(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$ ，这个过程如之前所述。
 2. 核查过期时间阈值是否合规：
-   1. 断定 $\mathsf{exp\\_horizon}$ 的取值是否在 $(0, \mathsf{max\\_exp\\_horizon})$ 的范围内，这里 $\mathsf{max\\_exp\\_horizon}$ 是链上预设的参数，如前所述。
+   - 验证 $\mathsf{exp\\_horizon}$ 的取值是否在 $(0, \mathsf{max\\_exp\\_horizon})$ 的范围内，即 $\mathsf{exp\\_horizon} \in (0, \mathsf{max\\_exp\\_horizon})$，这里的 $\mathsf{max\\_exp\\_horizon}$ 是链上预设的参数，如前所述。
 3. 校验 EPK 是否已过期：
-   1. 断定当前块时间 $\mathsf{exp\\_date}$ 是否小于 $\texttt{current\_block\_time()}$ ，如之前所述。
-4. 确认 $\mathsf{epk}$ 对交易 $\mathsf{txn}$ 的短暂签名 $\sigma_\mathsf{eph}$ 的有效性，这依照之前的描述。
-5. 确定 OIDC 提供商的确切公钥，这通过 $\mathsf{jwk}$ 表示，按前文所述。
-6. 校验零知识证明 $\pi$，它声明了存在一个*私钥输入* $`\textbf{w}=[(\mathsf{aud\\_val}, \mathsf{uid\\_key}, \mathsf{uid\\_val}, r),(\sigma_\mathsf{oidc}, \mathsf{jwt}), \rho]`$，对应于*公共输入* $\textbf{x} = [(\mathsf{iss\\_val}, \mathsf{jwk}, \mathsf{header}), (\mathsf{epk}, \mathsf{exp\\_date}), \mathsf{addr\\_idc}, \mathsf{exp\\_horizon}]$，可满足关系 $\mathcal{R}(\textbf{x}; \textbf{w})=1$
-   - 需要重视的是，证明 $\pi$ 不会泄漏任何敏感的私钥输入 $`\textbf{w}`$。
-
-**零知识关系 $\mathcal{R}$** 旨在验证上文提到的模式泄露的隐私敏感部分：
-
-具体而言，当满足以下关系时，即认为验证通过：
+   - 检查当前块时间 $\mathsf{exp\\_date}$ 是否小于 $\texttt{current\_block\_time()}$ ，即 $\texttt{current\_block\_time()} < \mathsf{exp_date}$，如之前所述。
+4. 确认 $\mathsf{epk}$ 对交易 $\mathsf{txn}$ 的短暂签名 $\sigma_\mathsf{eph}$​ 的有效性，这依照之前的描述。
+5. 获取 OIDC 提供商的正确公钥 (Public Key)，其表示为 $\mathsf{jwk}$​ ，如前所述。
+6. 计算**公共输入哈希 (public inputs hash)**：    $$\mathsf{pih} = H_\mathsf{zk}(\mathsf{epk}, \mathsf{addr\\_idc}, \mathsf{exp\\_date}, \mathsf{exp\\_horizon}, \mathsf{iss\\_val}, \mathsf{extra\\_field}, \mathsf{header}, \mathsf{jwk}, \mathsf{override\\_aud\\_val})$$    
+7. 倘若**training wheels 公钥 ( public key)** 通过治理（governance）的方式被设置在区块链上（具体参见[这里](#training-wheels)），则：    -
+   - 需要对零知识证明 (ZKP) $\pi$ 及公共输入哈希 $\mathsf{pih}$ 的 **training wheels 签名** $\sigma_\mathsf{tw}$ 进行验证
+8. 验证（ZKPoK）$\pi$，它验证了一个**密钥输入 (secret input)** $\textbf{w}$ 的存在，这个输入满足下文定义的**零知识相关性 (ZK relation)** $\mathcal{R}$：
 
 $$
 \mathcal{R}\begin{pmatrix}
-    \textbf{x} = [
-        (\mathsf{iss\_val}, \mathsf{jwk}, \mathsf{header}), 
-        (\mathsf{epk}, \mathsf{exp\_date}), 
-        \mathsf{addr\_idc}, \mathsf{exp\_horizon}
-    ],\\ 
+    \mathsf{pih};\\
     \textbf{w} = [
-        (\mathsf{aud\_val}, \mathsf{uid\_key}, \mathsf{uid\_val}, r),
-        (\sigma_\mathsf{oidc}, \mathsf{jwt}), 
-        \rho]
-\end{pmatrix} = 1
+      \textbf{w}_\mathsf{pub} = (
+        \mathsf{epk},
+        \mathsf{addr\_idc}, 
+        \mathsf{exp\_date}, 
+        \mathsf{exp\_horizon}, 
+        \mathsf{iss\_val}, 
+        \mathsf{extra\_field}, 
+        \mathsf{header}, 
+        \mathsf{jwk}, 
+        \mathsf{override\_aud\_val}
+      ),\\
+      \textbf{w}_\mathsf{priv} = (
+        \mathsf{aud\_val}, 
+        \mathsf{uid\_key}, 
+        \mathsf{uid\_val}, 
+        r,
+        \sigma_\mathsf{oidc},
+        \mathsf{jwt},
+        \rho
+      )
+    ]
+\end{pmatrix}
 $$
 
-当且仅当：
+**零知识相关性 (ZK relation) $\mathcal{R}$** 主要负责从之前提到的**泄漏模式 (leaky mode)** 中执行涉及隐私的核心验证过程：
 
-1. 验证 JWT 中 OIDC 提供商的 ID：
-   1. 确认 $\mathsf{iss\\_val}$ 是否与 $\mathsf{jwt}[\texttt{"iss"}]$ 相等。
-2. 如果采用基于 `email` 的 ID，确保邮箱已经得到验证：
-   1. 如果 $\mathsf{uid\\_key}$ 等于 $\texttt{"email"}$，则确认 $\mathsf{jwt}[\texttt{"email\_verified"}]$ 值为 $\texttt{"true"}$。
-3. 核对 JWT 中的用户 ID 是否相符：
-   1. 确认 $\mathsf{uid\\_val}$ 是否与 $\mathsf{jwt}[\mathsf{uid\\_key}]$ 相等。
-4. 核实 JWT 中管理该应用的 ID 是否正确：
-   1. 确认 $\mathsf{aud\\_val}$ 是否与 $\mathsf{jwt}[\texttt{"aud"}]$ 相符。
-5. 核查地址 IDC 是否使用了 JWT 中的适当值：
-   1. 确认 $\mathsf{addr\\_idc}$ 是否等于 $H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$
-6. 校验 EPK 是否已在 JWT 的 `nonce` 字段中提交：
-   1. 确认 $\mathsf{jwt}[\texttt{"nonce"}]$ 是否等于 $H’(\mathsf{epk},\mathsf{exp\\_date};\rho)$
-7. 校验 EPK 的过期日期是否未超出预期：
-   1. 确认 $\mathsf{exp\\_date}$ 是否小于 $\mathsf{jwt}[\texttt{"iat"}] + \mathsf{exp\\_horizon}$
-8. 验证 OIDC 签名 $\sigma_\mathsf{oidc}$ 是在公钥 $\mathsf{jwk}$ 下对 JWT 的 $\mathsf{header}$ 和载荷 $\mathsf{jwt}$ 进行的。
+1. 验证 —— 通过用 $H\_\mathsf{zk}$ （如前文所述）对 $\textbf{w}\_\mathsf{pub}$ 中的输入进行哈希处理，得到的公开输入哈希 $\mathsf{pih}$​ —— 是否正确。
+2. 检查JWT中的OIDC提供商ID：
+   - 验证 $\mathsf{iss\\_val}$ 是否与 $\mathsf{jwt}[\texttt{"iss"}]$ 相等，即：$\mathsf{iss\\_val}\stackrel{?}{=}\mathsf{jwt}[\texttt{"iss"}]$
+3. 如果采用基于 `email` 的 ID，则要确保邮箱已经得到验证：
+   1. 如果 $\mathsf{uid\\_key}$ 等于 $\texttt{"email"}$，则确认 $\mathsf{jwt}[\texttt{"email\_verified"}]$ 值为 $\texttt{"true"}$ ，即：$\mathsf{jwt}[\texttt{"email\_verified"}] \stackrel{?}{=} \texttt{"true"}$
+4. 核对 JWT 中的用户 ID ：
+   1. 确认 $\mathsf{uid\\_val}$ 是否与 $\mathsf{jwt}[\mathsf{uid\\_key}]$ 相等，即：$\mathsf{uid\\_val}\stackrel{?}{=}\mathsf{jwt}[\mathsf{uid\\_key}]$
+5. 检查地址 IDC 使用的值是否正确：
+   1. 确认 $\mathsf{aud\\_val}$ 是否与 $\mathsf{jwt}[\texttt{"aud"}]$ 相符，即：$\mathsf{addr\\_idc} \stackrel{?}{=} H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$。
+6. 我们是否处于恢复模式？（即，$\mathsf{override\\_aud\\_val} \stackrel{?}{=} \bot$）
+   - 如果是，则检查 JWT 中的管理应用程序 ID：验证 $\mathsf{aud\\_val}\stackrel{?}{=}\mathsf{jwt}[\texttt{"aud"}]$
+   - 否则，不进行操作，允许JWT中的 `aud` 与IDC中的 `aud` 不同。
+7. 校验 EPK 是否已在 JWT 的 `nonce` 字段中提交：
+   1. 确认 $\mathsf{jwt}[\texttt{"nonce"}]$ 是否等于 $H’(\mathsf{epk},\mathsf{exp\\_date};\rho)$，即：$\mathsf{jwt}[\texttt{"nonce"}] \stackrel{?}{=} H’(\mathsf{epk},\mathsf{exp\\_date};\rho)$
+8. 校验 EPK 的过期日期是否过于遥远：
+   1. 确认 $\mathsf{exp\\_date}$ 是否小于 $\mathsf{jwt}[\texttt{"iat"}] + \mathsf{exp\\_horizon}$，即： $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{exp\\_horizon}$
+9. 解析  $\mathsf{extra\\_field}$ 为 $\mathsf{extra\\_field\\_key}$ 和 $\mathsf{extra\\_field\\_val}$ 并验证 $\mathsf{extra\\_field\\_val}\stackrel{?}{=}\mathsf{jwt}[\mathsf{extra\\_field\\_key}]$​
+10. 验证 OIDC 签名 $\sigma_\mathsf{oidc}$ 基于 $\mathsf{jwk}$ 对JWT的 $\mathsf{header}$ 和负载 $\mathsf{jwt}$.
 
-**注意**：附加的 $\mathsf{exp\\_horizon}$ 变量作为一个中间层存在：它确保即使链上的 $\mathsf{max\\_exp\\_horizon}$ 参数发生了变化，零知识证明（ZKP）依然有效，因为它们把 $\mathsf{exp\\_horizon}$ 作为公共输入，而不是 $\mathsf{max\\_exp\\_horizon}$。
+>[!TIP]
+> 零知识证明 $\pi$ 不会泄露 $\textbf{w}$​ 中的任何隐私敏感输入。
+
+> [!NOTE]
+>
+> 附加的 $\mathsf{exp\\_horizon}$ 变量作为一个中间层存在：它确保即使链上的 $\mathsf{max\\_exp\\_horizon}$ 参数发生了变化，零知识证明（ZKP）依然有效，因为它们把 $\mathsf{exp\\_horizon}$ 作为公共输入，而不是 $\mathsf{max\\_exp\\_horizon}$​。
 
 我们稍后将讨论的**零知识模式的考虑因素**包括：
 
 1. 用户/钱包通过 pepper 服务获得 pepper $r$，我们会在[附录](#pepper-service)中对此服务进行简要说明。
 2. **计算零知识证明(ZKP)过程缓慢**。这需要专门的证明生成服务，在[附录](#(Oblivious)-ZK-proving-service)中有所简述。
 3. **在实施 ZK 关系时出现的错误**可以通过使用[“训练轮”模式](#training-wheels)来纠正。
+4. 对于**零知识关系实现的 Bugs**，可以通过采用 [“training-wheels” 模式](#training-wheels) 来有效规避。
 
 ## 六、参考实现
 
@@ -433,11 +496,264 @@ $$
 
 由此产生的问题是，如果不进行重新设置，我们无法升级或修复我们的零知识证明关系实现。所以，在未来，我们可能会迁移到一个**透明型**SNARK，或者采用与特定关系无关并且一次性的**通用可信设置**。
 
-### 2. 参考实现部分
 
-我们将在下方提供有关我们电路代码和 Rust 交易验证器的更多链接：
- - [Rust 验证器代码，用于处理泄露模式](https://github.com/aptos-labs/aptos-core/pull/11681)
- - [基于 Groth16 的零知识证明模式 Rust 验证器代码](https://github.com/aptos-labs/aptos-core/pull/11772)
+
+
+
+### 2. `keyless_account.move` Move 模块
+
+无密钥账户需要在链上进行以下配置：
+
+1. Groth16验证密钥，零知识证明（ZKP）需在该密钥下完成验证； 
+
+2. 特定的 Circuit 的常量值；
+
+3. training wheels 的公钥（如果有提供）；
+
+4. `aud` 的重写清单列表； 
+
+5. 单个交易（TXN）中允许的无密钥签名的最大数量，以此减少拒绝服务（DoS）攻击的风险。 
+
+相关配置被存放在 `aptos_framework::keyless_account` 内的两个资源中：
+
+
+```rust
+/// 用于实现无密钥账户的零知识关系的 288 字节 Groth16 验证密钥（VK）
+struct Groth16VerificationKey has key, store {
+    /// `alpha * G`的32字节序列化，其中`G`是`G1`的生成器。
+    alpha_g1: vector<u8>,
+    /// `alpha * H`的64字节序列化，其中`H`是`G2`的生成器。
+    beta_g2: vector<u8>,
+    /// `gamma * H`的64字节序列化，其中`H`是`G2`的生成器。
+    gamma_g2: vector<u8>,
+    /// `delta * H`的64字节序列化，其中`H`是`G2`的生成器。
+    delta_g2: vector<u8>,
+    /// `\forall i \in {0, ..., \ell}, 64-byte serialization of gamma^{-1} * (beta * a_i + alpha * b_i + c_i) * H`, 其中`H`是`G1`的生成器，`\ell`对于零知识关系是 1 。
+    gamma_abc_g1: vector<vector<u8>>,
+}
+
+struct Configuration has key, store {
+    /// 重写`aud`用于身份恢复服务的身份，这将帮助用户恢复与已经消失的dapps或钱包关联的无密钥账户
+    /// 重要提示：此恢复服务**不能**单独接管用户账户；用户必须首先通过 OAuth 在恢复服务中登录
+    /// 方可允许它轮换该用户的任何无密钥账户。
+    override_aud_vals: vector<String>,
+    /// 任何交易都不能拥有超过这个数量的无密钥签名。
+    max_signatures_per_txn: u16,
+    /// 从 JWT 签发时间起，EPK 过期时间可以被设置的最大时长（秒）。
+    max_exp_horizon_secs: u64,
+    /// 如果启用了 training wheels ，则是 training wheels 公钥
+    training_wheels_pubkey: Option<vector<u8>>,
+    /// 我们的 Circuit 支持的临时公钥的最大长度（93字节）
+    max_commited_epk_bytes: u16,
+    /// 我们的 Circuit 支持的JWT `iss` 字段的最大长度（例如 `"https://accounts.google.com"`）
+    max_iss_val_bytes: u16,
+    /// 我们的 Circuit 支持的JWT字段名称和值的最大长度（例如 `"max_age":"18"`）
+    max_extra_field_bytes: u16,
+    /// 我们的 Circuit 支持的base64url编码JWT头部的最大字节长度
+    max_jwt_header_b64_bytes: u32,
+}
+```
+
+此 Move 模块同样提供治理功能（functions ），用于更新链上的`Groth16VerificationKey`和`Configuration`配置项：
+
+```rust
+/// 将对Groth16验证密钥的更改排队。更改仅在重新配置后生效。
+/// 只能通过治理提案调用。
+///
+/// 警告：为了减轻 DoS 攻击的风险，VK更改应与训练轮公钥更改一起进行，
+/// 这样旧的VK的旧ZKP就不能作为潜在有效的ZKP重放。
+///
+/// 警告：如果设置了恶意密钥，这将导致资金被盗。
+public fun set_groth16_verification_key_for_next_epoch(fx: &signer, vk: Groth16VerificationKey) { /* ... */ }
+
+/// 将对无密钥配置的更改排队。更改仅在重新配置后生效。只能
+/// 通过治理提案调用。
+///
+/// 警告：恶意的`Configuration`可能导致 DoS 攻击，造成活性问题，或使恶意
+/// 恢复服务提供商能够网络钓鱼用户的账户。
+public fun set_configuration_for_next_epoch(fx: &signer, config: Configuration) { /* ... */ }
+
+/// 便捷方法，用于排队更改训练轮公钥。更改仅在重新配置后生效。
+/// 只能通过治理提案调用。
+///
+/// 警告：如果设置了恶意密钥，这*可能*导致资金被盗。
+public fun update_training_wheels_for_next_epoch(fx: &signer, pk: Option<vector<u8>>) acquires Configuration { /* ... */ }
+
+/// 便捷方法，用于排队更改最大过期时间范围。更改仅在重新配置后生效。
+/// 只能通过治理提案调用。
+public fun update_max_exp_horizon_for_next_epoch(fx: &signer, max_exp_horizon_secs: u64) acquires Configuration { /* ... */ }
+
+/// 便捷方法，用于排队清除覆盖`aud`的集合。更改仅在重新配置后生效。
+/// 只能通过治理提案调用。
+///
+/// 警告：当没有设置覆盖`aud`时，与已消失的应用关联的无密钥账户的恢复
+/// 将不再可能。
+public fun remove_all_override_auds_for_next_epoch(fx: &signer) acquires Configuration { /* ... */ }
+
+/// 便捷方法，用于排队追加到覆盖`aud`的集合。更改仅在重新配置后生效。
+/// 只能通过治理提案调用。
+///
+/// 警告：如果设置了恶意覆盖`aud`，这*可能*导致资金被盗。
+public fun add_override_aud_for_next_epoch(fx: &signer, aud: String) acquires Configuration { /* ... */ }
+```
+
+
+
+
+
+
+
+
+
+
+
+#### `aud` 重写列表
+
+请注意，为了配合后文将会讨论的[恢复服务（见“恢复服务”一节）](#recovery-service)，Move 模块在`Configuration`中保留了一个`aud`的替代列表。正如在 [“签名”](#signatures) 以及 [“恢复服务”](#recovery-service) 两节中所解释的那样，当应用程序（dapp）消失时，这些`aud`对应的 OIDC 签名可允许用户恢复与任意`client_id` 相关联的无密钥账户。
+
+### Rust structs
+
+无密钥公钥定义为：
+
+```rust
+pub struct KeylessPublicKey {
+    /// JWT中`iss`字段的值，表示OIDC提供商。
+    /// 例如：https://accounts.google.com
+    pub iss_val: String,
+
+    /// 对以下内容的 SNARK 友好型承诺：
+    /// 1. 应用程序的ID；即签名OIDC JWT中的`aud`字段，代表OAuth客户端ID。
+    /// 2. OIDC提供商的用户内部标识符；例如JWT中签名的`sub`字段，
+    ///   它是Google对bob@gmail.com的用户内部标识符，或者是`email`字段。
+    ///
+    /// 例如：H(aud || uid_key || uid_val || pepper)，其中`pepper`是用于隐藏
+    ///  `aud`和`sub`的承诺随机性。
+    pub idc: IdCommitment,
+}
+
+pub struct IdCommitment(#[serde(with = "serde_bytes")] pub(crate) Vec<u8>);
+```
+
+无密钥签名定义为：
+
+```rust
+pub struct KeylessSignature {
+    pub cert: EphemeralCertificate,
+
+    // 解码后的明文JWT头部（即，不是base64url编码的），包含两个相关字段：
+    //  1. `kid`，指明应该使用OIDC提供商的哪个JWK来验证
+    //     [零知识证明的] OpenID签名。
+    //  2. `alg`，指明签署JWT时使用了哪种类型的签名方案
+    pub jwt_header_json: String,
+
+    // `ephemeral_pubkey`的过期时间，以UNIX纪元时间戳（秒）表示。
+    pub exp_date_secs: u64,
+
+    // 用于验证`ephemeral_signature`的短期公钥。
+    pub ephemeral_pubkey: EphemeralPublicKey,
+
+    // 在`ephemeral_pubkey`下对交易以及ZKP（如果存在）的签名。
+    // 将ZKP包含在此签名中，以防止可更改攻击。
+    pub ephemeral_signature: EphemeralSignature,
+}
+
+pub enum EphemeralCertificate {
+    ZeroKnowledgeSig(ZeroKnowledgeSig),
+    OpenIdSig(OpenIdSig),
+}
+
+pub struct ZeroKnowledgeSig {
+    pub proof: ZKP,
+    //  Circuit 应在nonce中承诺的过期日期上执行的过期范围。
+    // 这必须 <= `Configuration::max_expiration_horizon_secs`。
+    pub exp_horizon_secs: u64,
+    // 一个可选的额外字段（例如，`"<name>":"<val>"`），将在JWT中公开匹配
+    pub extra_field: Option<String>,
+    // 将设置为覆盖`aud`值， Circuit 应该匹配此值，而不是IDC中的`aud`。
+    // 这将允许用户恢复与不再在线的应用程序绑定的无密钥账户。
+    pub override_aud_val: Option<String>,
+    // 通过训练轮SK对证明和声明进行签名，以减轻我们 Circuit 中的缺点。
+    pub training_wheels_signature: Option<EphemeralSignature>,
+}
+
+pub struct OpenIdSig {
+    // JWT中JWS签名的解码字节(https://datatracker.ietf.org/doc/html/rfc7515#section-3)
+    #[serde(with = "serde_bytes")]
+    pub jwt_sig: Vec<u8>,
+    // JWT的解码/明文JSON有效负载(https://datatracker.ietf.org/doc/html/rfc7519#section-3)
+    pub jwt_payload_json: String,
+    // 映射到用户标识的声明中的键的名称；例如，"sub"或"email"
+    pub uid_key: String,
+    // 用于在nonce字段中混淆来自OIDC提供商的EPK的随机值
+    #[serde(with = "serde_bytes")]
+    pub epk_blinder: Vec<u8>,
+    // 用于计算身份承诺的隐私保护值。它通常从`(iss, client_id, uid_key, uid_val)`唯一派生。
+    pub pepper: Pepper,
+    // 当使用覆盖aud_val时，签名需要包含IDC中承诺的aud_val，
+    // 因为JWT将包含覆盖。
+    pub idc_aud_val: Option<String>,
+}
+
+pub enum EphemeralPublicKey {
+    Ed25519 {
+        public_key: Ed25519PublicKey,
+    },
+    Secp256r1Ecdsa {
+        public_key: secp256r1_ecdsa::PublicKey,
+    },
+}
+
+pub enum EphemeralSignature {
+    Ed25519 {
+        signature: Ed25519Signature,
+    },
+    WebAuthn {
+        signature: PartialAuthenticatorAssertionResponse,
+    },
+}
+```
+
+### PRs
+
+我们将在下方添加更多链接到我们的 Circuit 代码和Rust交易认证器：
+
+- 为泄露模式（leaky mode）编写的 Rust 认证器代码 [#11681](https://github.com/aptos-labs/aptos-core/pull/11681)
+
+- 基于 Groth16 的 ZKP 模式的 Rust 认证器代码 [#11772](https://github.com/aptos-labs/aptos-core/pull/11772)
+
+- 从链上获取 Groth16 VK [#11895](https://github.com/aptos-labs/aptos-core/pull/11895)
+
+- 在 Rust 中正确处理 exp_horizon、VK 和配置初始化 [#11966](https://github.com/aptos-labs/aptos-core/pull/11966)
+
+- 可选的 training wheels 签名 [#11986](https://github.com/aptos-labs/aptos-core/pull/11986)
+
+- 修复烟雾测试（smoke test） [#11994](https://github.com/aptos-labs/aptos-core/pull/11994)
+
+- 使用基数为 10 的字符串作为 nonce [#12001](https://github.com/aptos-labs/aptos-core/pull/12001)
+
+- 移除 uid_key 限制 [#12007](https://github.com/aptos-labs/aptos-core/pull/12007)
+
+- 优化`iss`存储并重构 [#12017](https://github.com/aptos-labs/aptos-core/pull/12017)
+
+- 重命名为 AIP-61 术语 [#12123](https://github.com/aptos-labs/aptos-core/pull/12123)
+
+- 重命名为无密钥（keyless） [#12285](https://github.com/aptos-labs/aptos-core/pull/12285)
+
+- 修复 base64 ，修复 training wheels 签名 [#12287](https://github.com/aptos-labs/aptos-core/pull/12287)
+
+- 为某些无密钥结构体自定义十六进制序列化 [#12295](https://github.com/aptos-labs/aptos-core/pull/12295)
+
+- 端到端测试特性门控 [#12296](https://github.com/aptos-labs/aptos-core/pull/12296)
+
+- 支持基于密码的 EPK 和修复不可更改（non-malleability）签名 [#12333](https://github.com/aptos-labs/aptos-core/pull/12333)
+
+- 更新验证密钥和测试证明 [#12413](https://github.com/aptos-labs/aptos-core/pull/12413)
+
+- 修复公共输入哈希生成，修复 serde 反序列化，将 Google 添加为 devnet 中的默认 OIDC 提供商 [#12476](https://github.com/aptos-labs/aptos-core/pull/12476/files)
+
+- 修复特性门控（gating ）并匹配 alg 字段 [#12521](https://github.com/aptos-labs/aptos-core/pull/12521)
+
+  
 
 ## 七、测试（可选项）
 
@@ -447,11 +763,11 @@ $$
 
 ### 1. 签名验证的正确性与完整性测试
 
-- 受支持的提供商有效的 [身份验证知识证明(ZKPoKs) of] OIDC 签名将通过验证
-- 受支持的提供商过期的 [身份验证知识证明(ZKPoKs) of] OIDC 签名将不被验证
-- 不受支持的提供商的签名不会通过验证
-- 没有临时签名的 [身份验证知识证明(ZKPoKs) of] OIDC 签名将验证失败
-- ZKP 是防伪造的
+- <u>未过期的</u> 来自支持的提供商的 [ ZKPoKs 的 ] OIDC 签名
+- <u>已过期的</u> 来自支持的提供商的 [ ZKPoKs 的 ] OIDC 签名不通过验证。
+- 来自**不支持的**提供商的签名不通过验证。
+- 没有临时签名的 [ ZKPoKs 的 ] OIDC 签名验证失败。
+- 零知识证明（ZKPs）是不可更改的。
 
 ### 2. 其他测试内容
 
@@ -521,29 +837,77 @@ $$
 > - 是否需考虑其他的安全隐患？
 > - 是否有相关的安全设计文档或审计报告可供参考？
 
-### 1. 辅助轮
+### 1. Training wheels
 
 在我们最初的部署期间，我们打算在证明服务计算证明前，检验其关系准确无误之后为零知识证明（ZKP）添加一个额外的**辅助轮签名**步骤。通过这种方式，我们既可以避免单点的故障风险（即零知识证明关系的实现），同时也不会赋予证明服务额外的权力，以致于干涉账户安全。
 
-具体而言，当启用辅助轮系统时，即便我们在 Circom[^circom] 中实现的零知识证明关系出现漏洞，这也不会导致用户面临灾难性的资产损失。同时，被损害的证明服务本身也无法盗取资产：它必须像其他任何人一样计算（或伪造）一个有效的 ZKP 来攻击受害账户。
+具体来说，即使在初学者阶段（training wheels），我们的零知识证明（ZK）关系实现出错也不会导致用户资金遭受重大损失。同时，一个受到攻击的证明服务也无法独立盗取资金：它还必须要获取受害者的 OIDC 账户以及一份有效的 OIDC 签名。
 
 其中一个重要的**存活性问题**是，如果证明服务停止运作，用户可能暂时无法访问他们的账户。但是，我们预期此类停机会非常短暂，并且相对于我们初期部署时确保安全性的目标来说，这是一个可以接受的权衡。
+
+Training wheels 模式的公钥将被保存为链上的一个参数，在`aptos_framework::keyless_account::Configuration`资源中可以查到（详情见[此处](#keyless_accountmove-move-module)），并且可以通过治理来修改。 
+
+>[!NOTE] 
+> Training wheels 模式还起到了**防止DoS攻击的作用**，因为无效的零知识证明（ZKP）不会被证明服务签名。因此，由于我们的 Rust 验证代码首先会检查 Training wheels 的签名，它可以轻松地识别并排除无效的 ZKP，无需耗费资源进行验证。 
+> 一个关键的实现细节是，如果 Groth16 验证密钥（VK）发生变更，Training wheels 模式公钥（twPK）也必须同时更新，因为 Training wheels 的签名并不涵盖 VK。如果忘记更新twPK，可能会让攻击者利用旧的 VK 重放（replaying）旧的 ZK 证明，发起 DoS 攻击。
+
+### 2. 恢复服务
+
+
+
+
+
+
 
 ### 2. 管理应用程序消失的备用恢复机制
 
 再次说明，无密钥账户不仅与用户绑定，同时还与管理应用（比如dapp或钱包）绑定。
 
-不幸情况下，管理应用有可能会消失，原因多样：
+不幸情况下，管理应用有可能会消失，例如：
 
 1. 应用的 OAuth `client_id` 可能被 OIDC 提供商封禁（出于各种原因）。
 2. 一位疏忽的管理员可能会丢失应用的 OAuth `client_secret`，或是在 OIDC 提供商那里彻底注销了应用。
 3. 一位不知情的管理员可能简单地关停了应用（例如，从应用商店中撤下了移动应用，或停止了dapp网站的运作），而没意识到这会导致用户无法再使用应用内的无密钥账户。
 
-无论发生什么，如果**管理应用不再存在，用户将无法访问该应用绑定的无密钥账户**，因为缺少应用，他们无法获得签名的 JWT。
+换言之，**如果管理应用不存在，用户就无法再访问他们的无密钥账户**，因为他们无法在应用缺失的情况下获取到所需的已签名 JWT。
 
-为防止这种情况，我们建议设立一个**备用恢复机制**：
+不过，有了**恢复服务**，通过辅助用户（helping users）重新获得账户访问权限，就可以避免这种账户丢失的情况。具体而言，
 
-- 对于以**电子邮件**为基础的 OIDC 提供商，可以采用一个 DKIM 签名的电子邮件（内容格式正确的消息）中的 ZKPoK 来取代 OIDC 签名的 ZKPoK。
+1. 用户将使用他们的 OIDC 账号登录到恢复服务。
+2. 随后，恢复服务会获取基于它的 `client_id` 和用户的个人识别号 `sub` 的 OIDC 签名。
+3. 恢复服务的 `client_id` 将被列入 [`aud` 替换列表](#aud-override-list)，这是由之前成功的治理提案所确定的。
+4. 区块链验证者会承认这份 [零知识证明的] OIDC 签名，将其视为对 **任何** 管理应用的有效的无密钥签名。
+5. 因此，用户就可以利用这份 [零知识证明的] OIDC 签名，为他们那些无法进入的账户执行密钥更新操作。
+
+> [!WARNING]
+>
+> 恢复路径只有在通过治理手段将恢复服务的`client_id`添加到链上[`aud`替换列表](#aud-override-list)之后才能使用。
+
+这种做法的**优点**包括：
+
+1. 它最小化了中心化风险，因为恢复服务的 `client_id` 可以通过治理提案来设置。
+2. 可以添加多个这样的恢复服务，用户可以选择与他们最信任的服务进行交互。
+3. 恢复服务是无状态的，不存储先前登录用户签名过的 JWT。
+4. 不诚实的恢复服务不能单独轮换用户的账户。用户必须首先在恢复服务中登录。
+
+1. 它减少了中心化的风险，因为恢复服务的`client_id`是可以依据治理提议来设置的。
+2. 用户可以选择多个提供的恢复服务，并使用他们最信赖的那一个。
+3. 恢复服务本身不保留状态，也不储存用户以往登录时的已签名JWT。
+4. 不守信的恢复服务不能单独更改用户的账户，用户必须先登入恢复服务。
+
+这种办法的**缺点**是，如果用户登录到一个**积极恶意**的恢复服务，那么该服务可以窃取该用户所有的无密钥账户。因此，用户必须警惕他们所使用的恢复服务。
+
+为了缓解这个问题，可能可以通过MPC（多党计算）技术来分发恢复服务。这将确保签名的JWT不会被服务器的少数串通者窃取。这被留作未来的工作。
+
+#### 其他恢复路径
+
+虽然可能存在**替代的恢复路径**，但它们要么用户体验差，要么容易受到网络钓鱼攻击，要么在所有平台上都不适用，或者需要中心化：
+
+- 对于**基于电子邮件**的OIDC提供商，我们可以将 OIDC 签名的 ZKPoK 替换为一个 DKIM 签名电子邮件[^zkemail] 的 ZKPoK（具有正确格式的消息）。
+
+
+
+1. 对于以**电子邮件**为基础的 OIDC 提供商，可以采用一个 DKIM 签名的电子邮件（内容格式正确的消息）中的 ZKPoK 来取代 OIDC 签名的 ZKPoK。
   - 尽管这可能用户体验不佳，但它提供了一种紧急情况下的恢复方式，还能**保护隐私**。
   - 确保此流程**难以被仿冒**是关键，因为用户可能受到攻击者的诱骗而发送所谓的“账户重置”邮件。
   - 例如，只有在账户长时间未活动时才启用此流程。
