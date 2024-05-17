@@ -1,13 +1,18 @@
 ---
 aip: 61
 title: 无秘钥账户
-author: Alin Tomescu (alin@aptoslabs.com)
+author:
+  name: Alin Tomescu
+  email: alin@aptoslabs.com
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/297
-Status: 已接受
-last-call-end-date: 2024/02/15
-type: Standard (Core, Framework)
-created: 2024/01/04
-requires: <AIP number(s)>
+status: 已接受
+last-call-end-date: '2024-02-15'
+type: "Standard (Core, Framework)"
+created: '2024-01-04'
+requires: "<AIP number(s)>"
+original:
+  en: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md
+  zh: https://github.com/ALCOVE-LAB/Aptos-Docs/blob/main/AIP/aip-61.md
 ---
 
 [TOC]
@@ -30,11 +35,6 @@ requires: <AIP number(s)>
 
 > [!WARNING]
 > 无密钥账户的一个重要特性是，它们不仅与用户的 OIDC 账户**绑定**（例如， `alice@gmail.com` ），同时也与一个在 OIDC 提供商注册的**管理应用程序**绑定（例如， dapp 的`dapp.xyz`网站，或者手机的钱包应用）。换句话说，它们是**特定应用程序**的账户。因此，如果一个账户的管理应用程序消失或者丢失了其 OIDC 提供商的注册凭证，那么与这个应用程序绑定的用户账户将会无法访问，除非提供了可供替代的**恢复路径**（下面将进行讨论）。
-
-
-
-
-
 
 
 ### 1. 目标
@@ -1131,7 +1131,6 @@ Pepper 服务旨在帮助用户找回他们账户的 Pepper，如果 Pepper 遗�
 [^aip-81]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-81.md
 [^bn254]: [bn254](https://hackmd.io/@jpw/bn254)
 [^bonsay-pay]: [bonsay-pay](https://www.risczero.com/news/bonsai-pay)
-
 [^circom]: [circom](https://docs.circom.io/circom-language/signals/)
 [^eip-7522]: **EIP-7522: 针对AA账户的OIDC ZK验证器**, 作者: dongshu2013, [链接](https://eips.ethereum.org/EIPS/eip-7522)
 [^groth16]: **关于基于配对的非交互式论证的大小**, Jens Groth撰写，收录于《密码学进展 -- EUROCRYPT 2016》，2016年
